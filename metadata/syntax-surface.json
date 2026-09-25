@@ -1,0 +1,735 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": {
+    "tokenRegistry": "token_registry.def",
+    "tokenRegistrySha256": "d17224395364701bb8ff2bb5dc18464e9c0a97dbc6ec1a9d8a08bb9cfd1c3842",
+    "identifierPolicy": "identifier_policy_registry.def",
+    "identifierPolicySha256": "eec4c3d68735a00b1cc50bb2793ef4bdad45c41c29fbad894e525e00a01b4db8"
+  },
+  "identifierPolicy": {
+    "ignoredCodepoints": [
+      1600
+    ],
+    "startRanges": [
+      {
+        "start": 65,
+        "end": 90
+      },
+      {
+        "start": 97,
+        "end": 122
+      },
+      {
+        "start": 1569,
+        "end": 1594
+      },
+      {
+        "start": 1601,
+        "end": 1610
+      },
+      {
+        "start": 1646,
+        "end": 1647
+      },
+      {
+        "start": 1649,
+        "end": 1747
+      },
+      {
+        "start": 1765,
+        "end": 1766
+      },
+      {
+        "start": 1774,
+        "end": 1775
+      },
+      {
+        "start": 1786,
+        "end": 1788
+      },
+      {
+        "start": 1872,
+        "end": 1919
+      },
+      {
+        "start": 2208,
+        "end": 2249
+      }
+    ],
+    "startScalars": [
+      95,
+      1749,
+      1791
+    ],
+    "restRanges": [
+      {
+        "start": 48,
+        "end": 57
+      },
+      {
+        "start": 1611,
+        "end": 1631
+      },
+      {
+        "start": 1632,
+        "end": 1641
+      },
+      {
+        "start": 1750,
+        "end": 1756
+      },
+      {
+        "start": 1759,
+        "end": 1764
+      },
+      {
+        "start": 1767,
+        "end": 1768
+      },
+      {
+        "start": 1770,
+        "end": 1773
+      },
+      {
+        "start": 1776,
+        "end": 1785
+      },
+      {
+        "start": 2259,
+        "end": 2303
+      }
+    ],
+    "restScalars": [
+      1648
+    ]
+  },
+  "keywords": [
+    {
+      "token": "FUNCTION_TYPE",
+      "english": "fn",
+      "arabic": "دالة",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "OF",
+      "english": "of",
+      "arabic": "بنوع",
+      "group": "wordOperator",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "FROM",
+      "english": "from",
+      "arabic": "من",
+      "group": "module",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "EXTERN",
+      "english": "extern",
+      "arabic": "خارجي",
+      "group": "modifier",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "IMPORT",
+      "english": "import",
+      "arabic": "استورد",
+      "group": "module",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "USE",
+      "english": "use",
+      "arabic": "استخدم",
+      "group": "reserved",
+      "lifecycle": "Future_Reserved"
+    },
+    {
+      "token": "AS",
+      "english": "as",
+      "arabic": "مثل",
+      "group": "wordOperator",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "LIT_UNDEF",
+      "english": "undefined",
+      "arabic": "غير_معرف",
+      "group": "literal",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "FUNCTION_DEF",
+      "english": "def",
+      "arabic": "عرف",
+      "group": "declaration",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "ALIAS",
+      "english": "alias",
+      "arabic": "مرادف",
+      "group": "declaration",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "LET",
+      "english": "let",
+      "arabic": "دع",
+      "group": "declaration",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "RETURN",
+      "english": "return",
+      "arabic": "أرجع",
+      "group": "control",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "ELSE",
+      "english": "else",
+      "arabic": "وإلا",
+      "group": "control",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "IF",
+      "english": "if",
+      "arabic": "لو",
+      "group": "control",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "ANY",
+      "english": "any",
+      "arabic": "أي",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "BOOL",
+      "english": "bool",
+      "arabic": "منطقي",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "STRING",
+      "english": "string",
+      "arabic": "نص",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "CHAR",
+      "english": "char",
+      "arabic": "حرف",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "INT",
+      "english": "int",
+      "arabic": "عدد",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "UINT",
+      "english": "uint",
+      "arabic": "غير_موقع",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "FLOAT",
+      "english": "float",
+      "arabic": "عدد_عائم",
+      "group": "reserved",
+      "lifecycle": "Future_Reserved"
+    },
+    {
+      "token": "VOID",
+      "english": "void",
+      "arabic": "فراغ",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "I8",
+      "english": "i8",
+      "arabic": "ص8",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "I16",
+      "english": "i16",
+      "arabic": "ص16",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "I32",
+      "english": "i32",
+      "arabic": "ص32",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "I64",
+      "english": "i64",
+      "arabic": "ص64",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "U8",
+      "english": "u8",
+      "arabic": "غ8",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "U16",
+      "english": "u16",
+      "arabic": "غ16",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "U32",
+      "english": "u32",
+      "arabic": "غ32",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "U64",
+      "english": "u64",
+      "arabic": "غ64",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "F32",
+      "english": "f32",
+      "arabic": "ع32",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "F64",
+      "english": "f64",
+      "arabic": "ع64",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "ASSEMBLY",
+      "english": "asm",
+      "arabic": "تجميع",
+      "group": "special",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "UNSAFE",
+      "english": "unsafe",
+      "arabic": "غير_آمن",
+      "group": "modifier",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "WHILE",
+      "english": "while",
+      "arabic": "بينما",
+      "group": "control",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "FOR",
+      "english": "for",
+      "arabic": "لكل",
+      "group": "keyword",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "BREAK",
+      "english": "break",
+      "arabic": "اخرج_من_حلقة",
+      "group": "keyword",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "CONTINUE",
+      "english": "continue",
+      "arabic": "تابع_حلقة",
+      "group": "keyword",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "TYPE",
+      "english": "type",
+      "arabic": "نوع",
+      "group": "declaration",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "MATCH",
+      "english": "match",
+      "arabic": "طابق",
+      "group": "control",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "WITH",
+      "english": "with",
+      "arabic": "مع",
+      "group": "control",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "MUTABLE",
+      "english": "mutable",
+      "arabic": "متغير",
+      "group": "modifier",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "PUBLIC",
+      "english": "public",
+      "arabic": "عام",
+      "group": "modifier",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "SLICE_OPERATOR",
+      "english": "slice",
+      "arabic": "شريحة",
+      "group": "type",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "BOX_OPERATOR",
+      "english": "box",
+      "arabic": "صندوق",
+      "group": "type",
+      "lifecycle": "Active"
+    }
+  ],
+  "booleanLiterals": [
+    {
+      "english": "true",
+      "arabic": "صواب",
+      "value": 1
+    },
+    {
+      "english": "false",
+      "arabic": "خطأ",
+      "value": 0
+    }
+  ],
+  "groups": {
+    "control": [
+      "return",
+      "match",
+      "while",
+      "بينما",
+      "else",
+      "with",
+      "أرجع",
+      "طابق",
+      "وإلا",
+      "if",
+      "لو",
+      "مع"
+    ],
+    "declaration": [
+      "alias",
+      "مرادف",
+      "type",
+      "def",
+      "let",
+      "عرف",
+      "نوع",
+      "دع"
+    ],
+    "module": [
+      "import",
+      "استورد",
+      "from",
+      "من"
+    ],
+    "modifier": [
+      "mutable",
+      "غير_آمن",
+      "extern",
+      "public",
+      "unsafe",
+      "خارجي",
+      "متغير",
+      "عام"
+    ],
+    "type": [
+      "غير_موقع",
+      "string",
+      "slice",
+      "شريحة",
+      "صندوق",
+      "منطقي",
+      "bool",
+      "char",
+      "uint",
+      "void",
+      "دالة",
+      "فراغ",
+      "any",
+      "box",
+      "f32",
+      "f64",
+      "i16",
+      "i32",
+      "i64",
+      "int",
+      "u16",
+      "u32",
+      "u64",
+      "حرف",
+      "ص16",
+      "ص32",
+      "ص64",
+      "ع32",
+      "ع64",
+      "عدد",
+      "غ16",
+      "غ32",
+      "غ64",
+      "fn",
+      "i8",
+      "u8",
+      "أي",
+      "ص8",
+      "غ8",
+      "نص"
+    ],
+    "wordOperator": [
+      "بنوع",
+      "مثل",
+      "as",
+      "of"
+    ],
+    "special": [
+      "تجميع",
+      "asm"
+    ],
+    "keyword": [
+      "اخرج_من_حلقة",
+      "تابع_حلقة",
+      "continue",
+      "break",
+      "for",
+      "لكل"
+    ],
+    "literal": [
+      "undefined",
+      "غير_معرف",
+      "false",
+      "true",
+      "صواب",
+      "خطأ"
+    ],
+    "reserved": [
+      "عدد_عائم",
+      "استخدم",
+      "float",
+      "use"
+    ]
+  },
+  "declarationNames": {
+    "def": "function",
+    "عرف": "function",
+    "alias": "type",
+    "مرادف": "type",
+    "let": "variable",
+    "دع": "variable",
+    "type": "type",
+    "نوع": "type"
+  },
+  "operators": [
+    ">>>",
+    "<=",
+    "==",
+    "!=",
+    ">=",
+    "&&",
+    "||",
+    "<<",
+    ">>",
+    ":=",
+    "->",
+    "+",
+    "-",
+    "*",
+    "/",
+    "%",
+    "=",
+    "<",
+    ">",
+    "!",
+    "&",
+    "|",
+    "~",
+    "{",
+    "}",
+    "^",
+    ".",
+    ",",
+    ";",
+    ":",
+    "(",
+    ")",
+    "[",
+    "]"
+  ],
+  "operatorEntries": [
+    {
+      "token": "ARITHMETIC_RIGHT_SHIFT_OPERATOR",
+      "spelling": ">>>"
+    },
+    {
+      "token": "LESS_THAN_OR_EQUAL_OPERATOR",
+      "spelling": "<="
+    },
+    {
+      "token": "EQUALS_OPERATOR",
+      "spelling": "=="
+    },
+    {
+      "token": "NOT_EQUAL_OPERATOR",
+      "spelling": "!="
+    },
+    {
+      "token": "GREATER_THAN_OR_EQUAL_OPERATOR",
+      "spelling": ">="
+    },
+    {
+      "token": "AND_AND_OPERATOR",
+      "spelling": "&&"
+    },
+    {
+      "token": "OR_OR_OPERATOR",
+      "spelling": "||"
+    },
+    {
+      "token": "LEFT_SHIFT_OPERATOR",
+      "spelling": "<<"
+    },
+    {
+      "token": "RIGHT_SHIFT_OPERATOR",
+      "spelling": ">>"
+    },
+    {
+      "token": "OPERATOR_ASSIGNMENT_COLON",
+      "spelling": ":="
+    },
+    {
+      "token": "RIGHT_ARROW_OPERATOR",
+      "spelling": "->"
+    },
+    {
+      "token": "PLUS_OPERATOR",
+      "spelling": "+"
+    },
+    {
+      "token": "MINUS_OPERATOR",
+      "spelling": "-"
+    },
+    {
+      "token": "STAR_OPERATOR",
+      "spelling": "*"
+    },
+    {
+      "token": "SLASH_OPERATOR",
+      "spelling": "/"
+    },
+    {
+      "token": "PERCENT_OPERATOR",
+      "spelling": "%"
+    },
+    {
+      "token": "DEFINITION_SEPARATOR",
+      "spelling": "="
+    },
+    {
+      "token": "LESS_THAN_OPERATOR",
+      "spelling": "<"
+    },
+    {
+      "token": "GREATER_THAN_OPERATOR",
+      "spelling": ">"
+    },
+    {
+      "token": "NOT_OPERATOR",
+      "spelling": "!"
+    },
+    {
+      "token": "AND_OPERATOR",
+      "spelling": "&"
+    },
+    {
+      "token": "OR_OPERATOR",
+      "spelling": "|"
+    },
+    {
+      "token": "TILDE_OPERATOR",
+      "spelling": "~"
+    },
+    {
+      "token": "LEFT_BRACE_OPERATOR",
+      "spelling": "{"
+    },
+    {
+      "token": "RIGHT_BRACE_OPERATOR",
+      "spelling": "}"
+    },
+    {
+      "token": "CARET_OPERATOR",
+      "spelling": "^"
+    },
+    {
+      "token": "DOT_OPERATOR",
+      "spelling": "."
+    },
+    {
+      "token": "COMMA_OPERATOR",
+      "spelling": ","
+    },
+    {
+      "token": "SEMICOLON_OPERATOR",
+      "spelling": ";"
+    },
+    {
+      "token": "COLON_OPERATOR",
+      "spelling": ":"
+    },
+    {
+      "token": "LEFT_PARENTHESIS_OPERATOR",
+      "spelling": "("
+    },
+    {
+      "token": "RIGHT_PARENTHESIS_OPERATOR",
+      "spelling": ")"
+    },
+    {
+      "token": "LEFT_BRACKET_OPERATOR",
+      "spelling": "["
+    },
+    {
+      "token": "RIGHT_BRACKET_OPERATOR",
+      "spelling": "]"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+// Canonical English SultanC surface.
+def main(): int {
+    let value: int = 42;
+    if (value == 42) {
+        return 0;
+    };
+    return 1;
+}

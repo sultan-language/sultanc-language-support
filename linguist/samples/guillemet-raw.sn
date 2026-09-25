@@ -1,0 +1,5 @@
+def main ():int {
+    let payload:string = «{"name":"Sultan","age":20,"nested":«raw «deep» text»}»;
+    let path:string = «C:\projects\sultan\generated\code.sn»;
+    return 0;
+}

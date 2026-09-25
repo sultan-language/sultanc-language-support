@@ -1,0 +1,8 @@
+{
+  "name": "SultanC",
+  "id": "sultanc",
+  "extensions": [".sn"],
+  "scopeName": "source.sultanc",
+  "lineComment": "//",
+  "sourceDirection": "bilingual-arabic-first"
+}
