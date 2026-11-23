@@ -2,13 +2,27 @@
   "schemaVersion": 1,
   "generatedFrom": {
     "tokenRegistry": "token_registry.def",
-    "tokenRegistrySha256": "d17224395364701bb8ff2bb5dc18464e9c0a97dbc6ec1a9d8a08bb9cfd1c3842",
+    "tokenRegistrySha256": "49b92b47728acf8fb3c348689c73369752066aef808f79bf417f0ee6a6516242",
     "identifierPolicy": "identifier_policy_registry.def",
     "identifierPolicySha256": "eec4c3d68735a00b1cc50bb2793ef4bdad45c41c29fbad894e525e00a01b4db8"
   },
   "identifierPolicy": {
     "ignoredCodepoints": [
       1600
+    ],
+    "normalizedCodepoints": [
+      {
+        "from": 1570,
+        "to": 1575
+      },
+      {
+        "from": 1571,
+        "to": 1575
+      },
+      {
+        "from": 1573,
+        "to": 1575
+      }
     ],
     "startRanges": [
       {
@@ -105,6 +119,13 @@
   },
   "keywords": [
     {
+      "token": "COMPTIME",
+      "english": "comptime",
+      "arabic": "وقت_الترجمة",
+      "group": "keyword",
+      "lifecycle": "Active"
+    },
+    {
       "token": "FUNCTION_TYPE",
       "english": "fn",
       "arabic": "دالة",
@@ -137,6 +158,13 @@
       "english": "import",
       "arabic": "استورد",
       "group": "module",
+      "lifecycle": "Active"
+    },
+    {
+      "token": "MODULE",
+      "english": "module",
+      "arabic": "وحدة",
+      "group": "keyword",
       "lifecycle": "Active"
     },
     {
@@ -177,7 +205,7 @@
     {
       "token": "LET",
       "english": "let",
-      "arabic": "دع",
+      "arabic": "ليكن",
       "group": "declaration",
       "lifecycle": "Active"
     },
@@ -198,7 +226,7 @@
     {
       "token": "IF",
       "english": "if",
-      "arabic": "لو",
+      "arabic": "إذا",
       "group": "control",
       "lifecycle": "Active"
     },
@@ -240,7 +268,7 @@
     {
       "token": "UINT",
       "english": "uint",
-      "arabic": "غير_موقع",
+      "arabic": "طبيعي",
       "group": "type",
       "lifecycle": "Active"
     },
@@ -289,28 +317,28 @@
     {
       "token": "U8",
       "english": "u8",
-      "arabic": "غ8",
+      "arabic": "ط8",
       "group": "type",
       "lifecycle": "Active"
     },
     {
       "token": "U16",
       "english": "u16",
-      "arabic": "غ16",
+      "arabic": "ط16",
       "group": "type",
       "lifecycle": "Active"
     },
     {
       "token": "U32",
       "english": "u32",
-      "arabic": "غ32",
+      "arabic": "ط32",
       "group": "type",
       "lifecycle": "Active"
     },
     {
       "token": "U64",
       "english": "u64",
-      "arabic": "غ64",
+      "arabic": "ط64",
       "group": "type",
       "lifecycle": "Active"
     },
@@ -345,7 +373,7 @@
     {
       "token": "WHILE",
       "english": "while",
-      "arabic": "بينما",
+      "arabic": "طالما",
       "group": "control",
       "lifecycle": "Active"
     },
@@ -420,6 +448,38 @@
       "lifecycle": "Active"
     }
   ],
+  "deprecatedKeywords": [
+    {
+      "token": "WHILE",
+      "spelling": "بينما",
+      "canonical": "طالما"
+    },
+    {
+      "token": "UINT",
+      "spelling": "غير_موقع",
+      "canonical": "طبيعي"
+    },
+    {
+      "token": "U8",
+      "spelling": "غ8",
+      "canonical": "ط8"
+    },
+    {
+      "token": "U16",
+      "spelling": "غ16",
+      "canonical": "ط16"
+    },
+    {
+      "token": "U32",
+      "spelling": "غ32",
+      "canonical": "ط32"
+    },
+    {
+      "token": "U64",
+      "spelling": "غ64",
+      "canonical": "ط64"
+    }
+  ],
   "booleanLiterals": [
     {
       "english": "true",
@@ -437,25 +497,25 @@
       "return",
       "match",
       "while",
-      "بينما",
+      "طالما",
       "else",
       "with",
       "أرجع",
       "طابق",
       "وإلا",
+      "إذا",
       "if",
-      "لو",
       "مع"
     ],
     "declaration": [
       "alias",
       "مرادف",
       "type",
+      "ليكن",
       "def",
       "let",
       "عرف",
-      "نوع",
-      "دع"
+      "نوع"
     ],
     "module": [
       "import",
@@ -474,11 +534,11 @@
       "عام"
     ],
     "type": [
-      "غير_موقع",
       "string",
       "slice",
       "شريحة",
       "صندوق",
+      "طبيعي",
       "منطقي",
       "bool",
       "char",
@@ -501,18 +561,18 @@
       "ص16",
       "ص32",
       "ص64",
+      "ط16",
+      "ط32",
+      "ط64",
       "ع32",
       "ع64",
       "عدد",
-      "غ16",
-      "غ32",
-      "غ64",
       "fn",
       "i8",
       "u8",
       "أي",
       "ص8",
-      "غ8",
+      "ط8",
       "نص"
     ],
     "wordOperator": [
@@ -527,9 +587,13 @@
     ],
     "keyword": [
       "اخرج_من_حلقة",
+      "وقت_الترجمة",
       "تابع_حلقة",
+      "comptime",
       "continue",
+      "module",
       "break",
+      "وحدة",
       "for",
       "لكل"
     ],
@@ -554,7 +618,7 @@
     "alias": "type",
     "مرادف": "type",
     "let": "variable",
-    "دع": "variable",
+    "ليكن": "variable",
     "type": "type",
     "نوع": "type"
   },
@@ -570,6 +634,8 @@
     ">>",
     ":=",
     "->",
+    "؟",
+    "@",
     "+",
     "-",
     "*",
@@ -592,7 +658,8 @@
     "(",
     ")",
     "[",
-    "]"
+    "]",
+    "?"
   ],
   "operatorEntries": [
     {
@@ -638,6 +705,14 @@
     {
       "token": "RIGHT_ARROW_OPERATOR",
       "spelling": "->"
+    },
+    {
+      "token": "QUESTION_OPERATOR",
+      "spelling": "؟"
+    },
+    {
+      "token": "AT_OPERATOR",
+      "spelling": "@"
     },
     {
       "token": "PLUS_OPERATOR",
@@ -730,6 +805,10 @@
     {
       "token": "RIGHT_BRACKET_OPERATOR",
       "spelling": "]"
+    },
+    {
+      "token": "QUESTION_OPERATOR",
+      "spelling": "?"
     }
   ]
 }

@@ -1,0 +1,19 @@
+id = "sultanc"
+name = "SultanC"
+description = "SultanC language support: tree-sitter syntax (Arabic and English) and sultanc-lsp."
+version = "0.1.0"
+schema_version = 1
+authors = ["SultanC contributors"]
+repository = "https://github.com/sultanc-lang/sultanc-language-support"
+
+[grammars.sultanc]
+# Zed fetches this repository at `rev` and builds the grammar in `path`.
+# For a local dev install, file:// works:
+#   repository = "file:///absolute/path/to/sultanc-language-support"
+repository = "https://github.com/sultanc-lang/sultanc-language-support"
+rev = "REPLACE_WITH_COMMIT"
+path = "tree-sitter-sultanc"
+
+[language_servers.sultanc-lsp]
+name = "SultanC LSP"
+languages = ["SultanC"]

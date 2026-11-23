@@ -1,0 +1,5 @@
+import "broken.sn";
+
+def main(): int {
+    return flycheck_value();
+}

@@ -1,0 +1,549 @@
+{
+  "name": "sultanc",
+  "displayName": "SultanC",
+  "description": "SultanC language support: the native SultanC language server (hover, completion, navigation, diagnostics in Arabic and English) and an optional Arabic-first RTL editor.",
+  "version": "0.15.0",
+  "publisher": "sultanc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sultan-language/sultanc-language-support"
+  },
+  "homepage": "https://github.com/sultan-language/sultanc-language-support/tree/main/editors/vscode#readme",
+  "bugs": {
+    "url": "https://github.com/sultan-language/sultanc-language-support/issues"
+  },
+  "engines": {
+    "vscode": "^1.82.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "keywords": [
+    "SultanC",
+    "Arabic",
+    "RTL",
+    "bidi",
+    "systems programming",
+    "language server",
+    "LSP"
+  ],
+  "icon": "icons/sultanc-logo.png",
+  "galleryBanner": {
+    "color": "#1e1e2e",
+    "theme": "dark"
+  },
+  "pricing": "Free",
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onCommand:sultanc.explain",
+    "onTaskType:sultanc",
+    "workspaceContains:**/*.sn",
+    "workspaceContains:**/tests/**/*.sn",
+    "onDebugResolve:sultanc",
+    "onDebugInitialConfigurations",
+    "onDebugDynamicConfigurations:sultanc",
+    "onCommand:sultanc.debugFile"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "The language server executable is only started from settings in trusted workspaces.",
+      "restrictedConfigurations": [
+        "sultanc.server.path",
+        "sultanc.home"
+      ]
+    }
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "sultanc",
+        "aliases": [
+          "SultanC",
+          "سلطان سي",
+          "sultanc"
+        ],
+        "extensions": [
+          ".sn"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/sultanc-file.svg",
+          "dark": "./icons/sultanc-file.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sultanc",
+        "scopeName": "source.sultanc",
+        "path": "./syntaxes/sultanc.tmLanguage.json"
+      },
+      {
+        "scopeName": "markdown.sultanc.codeblock",
+        "path": "./syntaxes/markdown-sultanc.injection.json",
+        "injectTo": [
+          "text.html.markdown"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.sultanc": "sultanc"
+        }
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "sultanc.bidiEditor",
+        "displayName": "SultanC RTL Editor",
+        "selector": [
+          {
+            "filenamePattern": "*.sn"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
+    "commands": [
+      {
+        "command": "sultanc.restartServer",
+        "title": "Restart Language Server",
+        "category": "SultanC"
+      },
+      {
+        "command": "sultanc.showOutput",
+        "title": "Show Language Server Output",
+        "category": "SultanC"
+      },
+      {
+        "command": "sultanc.showServerInfo",
+        "title": "Show Language Server Info",
+        "category": "SultanC"
+      },
+      {
+        "command": "sultanc.openRtlEditor",
+        "title": "Reopen in RTL Editor",
+        "category": "SultanC",
+        "icon": "$(book)"
+      },
+      {
+        "command": "sultanc.openTextEditor",
+        "title": "Reopen in Text Editor",
+        "category": "SultanC",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "sultanc.useRtlEditorByDefault",
+        "title": "Open .sn Files in the RTL Editor by Default",
+        "category": "SultanC"
+      },
+      {
+        "command": "sultanc.useTextEditorByDefault",
+        "title": "Open .sn Files in the Text Editor by Default",
+        "category": "SultanC"
+      },
+      {
+        "command": "sultanc.runFile",
+        "title": "Run File",
+        "category": "SultanC",
+        "icon": "$(play)"
+      },
+      {
+        "command": "sultanc.checkFile",
+        "title": "Check File",
+        "category": "SultanC",
+        "icon": "$(check)"
+      },
+      {
+        "command": "sultanc.buildFile",
+        "title": "Build File",
+        "category": "SultanC",
+        "icon": "$(tools)"
+      },
+      {
+        "command": "sultanc.explain",
+        "title": "Explain Diagnostic Code",
+        "category": "SultanC"
+      },
+      {
+        "command": "sultanc.debugFile",
+        "title": "Debug File",
+        "category": "SultanC",
+        "icon": "$(debug-alt)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "sultanc.runFile",
+          "when": "resourceLangId == sultanc || activeCustomEditorId == sultanc.bidiEditor",
+          "group": "navigation@0"
+        },
+        {
+          "command": "sultanc.openRtlEditor",
+          "when": "resourceLangId == sultanc && activeEditor != 'workbench.editor.custom'",
+          "group": "navigation"
+        },
+        {
+          "command": "sultanc.openTextEditor",
+          "when": "activeCustomEditorId == sultanc.bidiEditor",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "sultanc.openRtlEditor",
+          "when": "resourceLangId == sultanc"
+        },
+        {
+          "command": "sultanc.openTextEditor",
+          "when": "activeCustomEditorId == sultanc.bidiEditor"
+        },
+        {
+          "command": "sultanc.runFile",
+          "when": "resourceExtname == .sn"
+        },
+        {
+          "command": "sultanc.checkFile",
+          "when": "resourceExtname == .sn"
+        },
+        {
+          "command": "sultanc.buildFile",
+          "when": "resourceExtname == .sn"
+        }
+      ],
+      "editor/title/run": [
+        {
+          "command": "sultanc.debugFile",
+          "when": "resourceLangId == sultanc",
+          "group": "navigation@2"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "SultanC",
+      "properties": {
+        "sultanc.server.path": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "markdownDescription": "Path to the `sultanc-analyzer` executable. When empty: `build/sultanc-analyzer` in a workspace folder, then `$SULTANC_HOME/build/sultanc-analyzer`, then `sultanc-analyzer` on `PATH`."
+        },
+        "sultanc.home": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "markdownDescription": "SultanC home: the directory containing `library/Supax.toml` (the standard library). The server runs with this as its working directory. When empty: `$SULTANC_HOME`, then the compiler checkout that contains the server, then a workspace folder."
+        },
+        "sultanc.diagnostics.language": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "ar",
+            "en"
+          ],
+          "enumDescriptions": [
+            "Follow each file's surface language: Arabic files get Arabic messages, English files English.",
+            "Always Arabic.",
+            "Always English."
+          ],
+          "default": "auto",
+          "description": "Language of diagnostics and hover labels."
+        },
+        "sultanc.checkOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run `sultanc check` on the project after each save (and at start) and show its diagnostics for files that are not open, as rust-analyzer runs `cargo check`. Open files keep their live diagnostics."
+        },
+        "sultanc.check.entries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "markdownDescription": "Entry files for the check on save, absolute or relative to the first workspace folder. Empty: `src/main.sn` or `main.sn` of each folder (or of its Supax package), the file `supax check` uses. For a SultanC checkout: `[\"compiler/main.sn\"]`."
+        },
+        "sultanc.lens.run": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show \"▶︎ Run · Debug\" above the program entry and \"▶︎ Run Test · Debug\" above each test."
+        },
+        "sultanc.lens.references": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show the number of references above each function, type and top-level value (a project-wide query per lens, so off by default, as in rust-analyzer)."
+        },
+        "sultanc.inlayHints.closingBraceHints.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the declaration after its closing brace (`} // def main`), as rust-analyzer does."
+        },
+        "sultanc.inlayHints.closingBraceHints.minLines": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 25,
+          "description": "Minimum number of lines a declaration spans to get a closing brace hint."
+        },
+        "sultanc.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Trace the JSON-RPC traffic between VS Code and the SultanC language server."
+        },
+        "sultanc.editor.direction": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "rtl",
+            "ltr"
+          ],
+          "default": "auto",
+          "description": "RTL editor: base direction. Auto keeps Arabic lines RTL and English lines LTR."
+        },
+        "sultanc.editor.fontScale": {
+          "type": "number",
+          "minimum": 0.8,
+          "maximum": 2,
+          "default": 1.3,
+          "description": "RTL editor: source font scale relative to VS Code's editor font size."
+        },
+        "sultanc.editor.lineHeight": {
+          "type": "number",
+          "minimum": 1.1,
+          "maximum": 2.5,
+          "default": 1.65,
+          "description": "RTL editor: source line-height multiplier."
+        },
+        "sultanc.editor.fontFamily": {
+          "type": "string",
+          "default": "\"IBM Plex Sans Arabic\", \"SF Arabic\", \"Noto Sans Arabic\", var(--vscode-editor-font-family), \"Geeza Pro\", sans-serif",
+          "description": "RTL editor: CSS font-family stack. No fonts are bundled."
+        },
+        "sultanc.editor.palette": {
+          "type": "string",
+          "enum": [
+            "nvim",
+            "vscode"
+          ],
+          "default": "nvim",
+          "description": "RTL editor: syntax palette."
+        },
+        "sultanc.editor.showLineNumbers": {
+          "type": "boolean",
+          "default": true,
+          "description": "RTL editor: show line numbers."
+        },
+        "sultanc.compiler.path": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "markdownDescription": "Path to the `sultanc` compiler used by Run / Check / Build / Explain. When empty: `<SultanC home>/build/sultanc`."
+        },
+        "sultanc.debug.debugger": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "gdb",
+            "lldb"
+          ],
+          "default": "auto",
+          "description": "Native debugger for SultanC launch configurations. auto: lldb on macOS, gdb elsewhere."
+        },
+        "sultanc.supax.path": {
+          "type": "string",
+          "default": "",
+          "description": "supax executable. The language server runs `supax metadata` for a folder holding Supax.toml. Empty: supax on PATH, else ~/.supax/bin/supax."
+        },
+        "sultanc.debug.gdbPath": {
+          "type": "string",
+          "default": "",
+          "description": "gdb executable (14 or later, for gdb -i=dap). Empty: gdb on PATH."
+        },
+        "sultanc.debug.lldbDapPath": {
+          "type": "string",
+          "default": "",
+          "description": "lldb-dap executable. Empty: lldb-dap on PATH, or xcrun -f lldb-dap on macOS."
+        }
+      }
+    },
+    "configurationDefaults": {
+      "[sultanc]": {
+        "editor.semanticHighlighting.enabled": true,
+        "editor.unicodeHighlight.ambiguousCharacters": false,
+        "editor.unicodeHighlight.invisibleCharacters": false,
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.trimAutoWhitespace": true
+      }
+    },
+    "snippets": [
+      {
+        "language": "sultanc",
+        "path": "./snippets/sultanc.json"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "sultanc.runFile",
+        "key": "ctrl+f5",
+        "mac": "cmd+f5",
+        "when": "resourceExtname == .sn"
+      }
+    ],
+    "taskDefinitions": [
+      {
+        "type": "sultanc",
+        "required": [
+          "command",
+          "file"
+        ],
+        "properties": {
+          "command": {
+            "type": "string",
+            "enum": [
+              "check",
+              "build",
+              "run"
+            ],
+            "description": "Compiler action"
+          },
+          "file": {
+            "type": "string",
+            "description": "Source file (.sn)"
+          }
+        }
+      }
+    ],
+    "problemMatchers": [
+      {
+        "name": "sultanc",
+        "owner": "sultanc",
+        "source": "SultanC",
+        "fileLocation": [
+          "autoDetect",
+          "${cwd}"
+        ],
+        "pattern": [
+          {
+            "regexp": "^(error|warning|note)\\[(SULTANC-[A-Z0-9-]+)\\]: (.*)$",
+            "severity": 1,
+            "code": 2,
+            "message": 3
+          },
+          {
+            "regexp": "^\\s*-->\\s+(.*?):(\\d+):(\\d+)(?:\\.\\.(\\d+):(\\d+))?\\s*$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "endLine": 4,
+            "endColumn": 5
+          }
+        ]
+      }
+    ],
+    "breakpoints": [
+      {
+        "language": "sultanc"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "sultanc",
+        "label": "SultanC",
+        "languages": [
+          "sultanc"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "program"
+            ],
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "A .sn file (compiled before the session) or an executable built by sultanc.",
+                "default": "${file}"
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Program arguments.",
+                "default": []
+              },
+              "cwd": {
+                "type": "string",
+                "description": "Working directory. Default: the program's directory."
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Extra environment variables."
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "Stop at the program entry (main / الرئيسية).",
+                "default": false
+              },
+              "debugger": {
+                "type": "string",
+                "enum": [
+                  "auto",
+                  "gdb",
+                  "lldb"
+                ],
+                "description": "Native debugger: gdb (gdb -i=dap, gdb 14+) or lldb (lldb-dap). auto: lldb on macOS, gdb elsewhere.",
+                "default": "auto"
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "sultanc",
+            "request": "launch",
+            "name": "Debug current SultanC file",
+            "program": "${file}",
+            "args": [],
+            "stopOnEntry": false
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "SultanC: Launch",
+            "description": "Build a .sn file with sultanc and debug it with gdb or lldb",
+            "body": {
+              "type": "sultanc",
+              "request": "launch",
+              "name": "Debug ${1:file}",
+              "program": "^\"\\${file}\"",
+              "args": []
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "sync-grammar": "node tools/sync-grammar.js",
+    "bundle": "esbuild src/extension.js --bundle --platform=node --target=node18 --format=cjs --external:vscode --outfile=out/extension.js --minify --sourcemap",
+    "package": "node tools/sync-grammar.js && npm run bundle && node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && npx --yes @vscode/vsce@3 package --no-dependencies --out dist/sultanc.vsix",
+    "test:integration": "npm run bundle && node test/integration/runTest.js",
+    "test:rtl": "npm run bundle && node test/integration/rtlTyping.js",
+    "package:platforms": "node tools/package-platforms.js"
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
+  },
+  "devDependencies": {
+    "@vscode/test-electron": "^2.4.1",
+    "esbuild": "^0.24.2"
+  }
+}

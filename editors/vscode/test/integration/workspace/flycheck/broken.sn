@@ -1,0 +1,3 @@
+public def flycheck_value(): int {
+    return not_declared_anywhere;
+}

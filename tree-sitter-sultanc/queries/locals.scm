@@ -1,0 +1,19 @@
+; Scopes and bindings for editors that use them (nvim-treesitter locals).
+; Name resolution proper belongs to sultanc-lsp; these only drive
+; same-file highlight of definitions and references.
+(source_file) @local.scope
+(function_declaration) @local.scope
+(block) @local.scope
+(closure_expression) @local.scope
+(match_arm) @local.scope
+(for_statement) @local.scope
+
+(parameter name: (identifier) @local.definition.parameter)
+(closure_parameter name: (identifier) @local.definition.parameter)
+(let_statement name: (identifier) @local.definition.var)
+(const_declaration name: (identifier) @local.definition.constant)
+(binding_pattern (identifier) @local.definition.var)
+(function_declaration name: (identifier) @local.definition.function)
+(type_declaration name: (identifier) @local.definition.type)
+
+(identifier) @local.reference

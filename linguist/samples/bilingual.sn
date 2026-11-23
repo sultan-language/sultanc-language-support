@@ -1,6 +1,6 @@
 // Arabic and English are canonical spellings of the same SultanC token model.
 public def main(): int {
-    دع value: عدد = 42;
+    ليكن value: عدد = 42;
     if (value == 42) {
         أرجع 0;
     }

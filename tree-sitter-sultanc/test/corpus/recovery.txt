@@ -1,0 +1,53 @@
+============================================================
+Missing semicolon is a MISSING node, not a lost statement
+============================================================
+
+def main(): int {
+    let value: int = 42
+}
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters)
+    (primitive_type)
+    (block
+      (let_statement
+        (identifier)
+        (primitive_type)
+        (integer)
+        (MISSING ";")))))
+
+============================================================
+Missing initializer stays inside its statement
+============================================================
+
+def broken(): int {
+    let x: int = ;
+    return x;
+}
+def later(): int { return 2; }
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters)
+    (primitive_type)
+    (block
+      (let_statement
+        (identifier)
+        (primitive_type)
+        (ERROR))
+      (return_statement
+        (identifier))))
+  (function_declaration
+    (identifier)
+    (parameters)
+    (primitive_type)
+    (block
+      (return_statement
+        (integer)))))

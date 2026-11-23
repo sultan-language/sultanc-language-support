@@ -1,0 +1,276 @@
+#!/usr/bin/env python3
+"""Generate editor tree-sitter query files from the canonical set.
+
+Canonical queries live in tree-sitter-sultanc/queries/ and use nvim-treesitter
+capture names. This script
+
+1. fills the keyword block of highlights.scm from metadata/syntax-surface.json
+   (the compiler's token registry), limited to nodes the grammar defines;
+2. writes editor copies with each editor's capture names:
+   editors/neovim/queries/sultanc/, editors/helix/runtime/queries/sultanc/,
+   editors/zed/languages/sultanc/.
+
+`--check` verifies that every generated file is up to date (CI / tests).
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+GRAMMAR = ROOT / "tree-sitter-sultanc"
+QUERIES = GRAMMAR / "queries"
+SURFACE = ROOT / "metadata" / "syntax-surface.json"
+NODE_TYPES = GRAMMAR / "src" / "node-types.json"
+
+BEGIN = "; BEGIN GENERATED KEYWORDS"
+END = "; END GENERATED KEYWORDS"
+
+# Compiler token -> nvim capture. Primitive types, booleans and `undefined`
+# are named nodes and are highlighted structurally instead.
+KEYWORD_CAPTURE = {
+    "FUNCTION_DEF": "keyword.function",
+    "FUNCTION_TYPE": "keyword.function",
+    "RETURN": "keyword.return",
+    "IF": "keyword.conditional",
+    "ELSE": "keyword.conditional",
+    "MATCH": "keyword.conditional",
+    "WITH": "keyword.conditional",
+    "WHILE": "keyword.repeat",
+    "FOR": "keyword.repeat",
+    "BREAK": "keyword.repeat",
+    "CONTINUE": "keyword.repeat",
+    "IMPORT": "keyword.import",
+    "MODULE": "keyword.import",
+    "FROM": "keyword.import",
+    "AS": "keyword.operator",
+    "OF": "keyword.operator",
+    "BOX_OPERATOR": "keyword.operator",
+    "SLICE_OPERATOR": "keyword.operator",
+    "LET": "keyword",
+    "ALIAS": "keyword",
+    "TYPE": "keyword.type",
+    "ASSEMBLY": "keyword",
+    "EXTERN": "keyword.modifier",
+    "PUBLIC": "keyword.modifier",
+    "MUTABLE": "keyword.modifier",
+    "UNSAFE": "keyword.modifier",
+    "COMPTIME": "keyword.modifier",
+}
+
+HELIX = {
+    "comment": "comment",
+    "number": "constant.numeric.integer",
+    "number.float": "constant.numeric.float",
+    "boolean": "constant.builtin.boolean",
+    "constant.builtin": "constant.builtin",
+    "constant": "constant",
+    "character": "constant.character",
+    "character.special": "variable.builtin",
+    "string": "string",
+    "string.escape": "constant.character.escape",
+    "type": "type",
+    "type.builtin": "type.builtin",
+    "type.definition": "type",
+    "constructor": "constructor",
+    "property": "variable.other.member",
+    "function": "function",
+    "function.call": "function",
+    "variable": "variable",
+    "variable.parameter": "variable.parameter",
+    "module": "namespace",
+    "attribute": "attribute",
+    "keyword": "keyword",
+    "keyword.function": "keyword.function",
+    "keyword.return": "keyword.control.return",
+    "keyword.conditional": "keyword.control.conditional",
+    "keyword.repeat": "keyword.control.repeat",
+    "keyword.import": "keyword.control.import",
+    "keyword.operator": "keyword.operator",
+    "keyword.modifier": "keyword.storage.modifier",
+    "keyword.type": "keyword.storage.type",
+    "operator": "operator",
+    "punctuation.bracket": "punctuation.bracket",
+    "punctuation.delimiter": "punctuation.delimiter",
+}
+
+ZED = {
+    "comment": "comment",
+    "number": "number",
+    "number.float": "number",
+    "boolean": "boolean",
+    "constant.builtin": "constant",
+    "constant": "constant",
+    "character": "string",
+    "character.special": "variable.special",
+    "string": "string",
+    "string.escape": "string.escape",
+    "type": "type",
+    "type.builtin": "type",
+    "type.definition": "type",
+    "constructor": "constructor",
+    "property": "property",
+    "function": "function",
+    "function.call": "function",
+    "variable": "variable",
+    "variable.parameter": "variable.parameter",
+    "module": "namespace",
+    "attribute": "attribute",
+    "keyword": "keyword",
+    "keyword.function": "keyword",
+    "keyword.return": "keyword",
+    "keyword.conditional": "keyword",
+    "keyword.repeat": "keyword",
+    "keyword.import": "keyword",
+    "keyword.operator": "keyword",
+    "keyword.modifier": "keyword",
+    "keyword.type": "keyword",
+    "operator": "operator",
+    "punctuation.bracket": "punctuation.bracket",
+    "punctuation.delimiter": "punctuation.delimiter",
+}
+
+TEXTOBJECTS = {"inner": "inside", "outer": "around"}
+
+HELIX_INDENTS = """; Helix indent captures.
+[
+  (block)
+  (item_block)
+  (record_type)
+  (record_expression)
+  (record_pattern)
+  (vector_expression)
+  (parameters)
+  (arguments)
+  (closure_parameters)
+  (enum_type)
+] @indent
+
+["}" "]" ")"] @outdent
+"""
+
+ZED_INDENTS = """(_ "{" "}" @end) @indent
+(_ "[" "]" @end) @indent
+(_ "(" ")" @end) @indent
+"""
+
+GENERATED_HEADER = "; Generated by tools/generate-tree-sitter-queries.py from tree-sitter-sultanc/queries. Do not edit.\n"
+
+
+def keyword_block(surface: dict, anonymous: set[str]) -> str:
+    groups: dict[str, list[str]] = {}
+    for entry in surface["keywords"]:
+        capture = KEYWORD_CAPTURE.get(entry["token"])
+        if not capture:
+            continue
+        for word in (entry["english"], entry["arabic"]):
+            if word in anonymous:
+                groups.setdefault(capture, []).append(word)
+    lines = [BEGIN]
+    for capture in sorted(groups):
+        words = " ".join(json.dumps(w, ensure_ascii=False) for w in groups[capture])
+        lines.append(f"[{words}] @{capture}")
+    lines.append(END)
+    return "\n".join(lines)
+
+
+def rename(text: str, table: dict[str, str], drop: set[str] = frozenset()) -> str:
+    def sub(match: re.Match[str]) -> str:
+        name = match.group(1)
+        if name in drop:
+            return ""
+        if name.startswith("local.") or name in ("fold",):
+            return match.group(0)
+        if name not in table:
+            raise SystemExit(f"no mapping for capture @{name}")
+        return "@" + table[name]
+
+    out = re.sub(r"@([A-Za-z_.]+)", sub, text)
+    return re.sub(r"[ \t]+\n", "\n", out)
+
+
+def patterns(text: str) -> list[str]:
+    """Split a query file into top-level patterns (comments attach forward)."""
+    chunks: list[str] = []
+    current: list[str] = []
+    depth = 0
+    for line in text.splitlines():
+        stripped = line.strip()
+        if depth == 0 and not stripped:
+            continue
+        current.append(line)
+        code = re.sub(r'"(?:\\.|[^"\\])*"', '""', line.split(";", 1)[0] if not stripped.startswith(";") else "")
+        depth += code.count("(") + code.count("[") - code.count(")") - code.count("]")
+        if depth == 0 and not stripped.startswith(";"):
+            chunks.append("\n".join(current))
+            current = []
+    if current:
+        chunks.append("\n".join(current))
+    return chunks
+
+
+def textobjects(text: str) -> str:
+    return re.sub(r"@([a-z]+)\.(inner|outer)", lambda m: f"@{m.group(1)}.{TEXTOBJECTS[m.group(2)]}", text)
+
+
+def outputs() -> dict[Path, str]:
+    surface = json.loads(SURFACE.read_text(encoding="utf-8"))
+    nodes = json.loads(NODE_TYPES.read_text(encoding="utf-8"))
+    anonymous = {n["type"] for n in nodes if not n["named"]}
+
+    highlights_path = QUERIES / "highlights.scm"
+    highlights = highlights_path.read_text(encoding="utf-8")
+    start, end = highlights.index(BEGIN), highlights.index(END) + len(END)
+    highlights = highlights[:start] + keyword_block(surface, anonymous) + highlights[end:]
+
+    q = {name: (QUERIES / f"{name}.scm").read_text(encoding="utf-8")
+         for name in ("locals", "folds", "indents", "textobjects", "brackets", "outline", "tags")}
+
+    files: dict[Path, str] = {highlights_path: highlights}
+
+    nvim = ROOT / "editors" / "neovim" / "queries" / "sultanc"
+    for name, text in (("highlights", highlights), ("locals", q["locals"]), ("folds", q["folds"]),
+                       ("indents", q["indents"]), ("textobjects", q["textobjects"])):
+        files[nvim / f"{name}.scm"] = GENERATED_HEADER + text
+
+    helix = ROOT / "editors" / "helix" / "runtime" / "queries" / "sultanc"
+    # Helix lets the first matching pattern win: reverse the canonical order.
+    helix_highlights = "\n\n".join(reversed(patterns(rename(highlights, HELIX, {"spell"})))) + "\n"
+    files[helix / "highlights.scm"] = GENERATED_HEADER + helix_highlights
+    files[helix / "locals.scm"] = GENERATED_HEADER + re.sub(r"@local\.definition\.[a-z]+", "@local.definition", q["locals"])
+    files[helix / "indents.scm"] = GENERATED_HEADER + HELIX_INDENTS
+    files[helix / "textobjects.scm"] = GENERATED_HEADER + textobjects(q["textobjects"])
+
+    zed = ROOT / "editors" / "zed" / "languages" / "sultanc"
+    files[zed / "highlights.scm"] = GENERATED_HEADER + rename(highlights, ZED, {"spell"})
+    files[zed / "brackets.scm"] = GENERATED_HEADER + q["brackets"]
+    files[zed / "outline.scm"] = GENERATED_HEADER + q["outline"]
+    files[zed / "indents.scm"] = GENERATED_HEADER + ZED_INDENTS
+    files[zed / "textobjects.scm"] = GENERATED_HEADER + textobjects(q["textobjects"])
+    return files
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args()
+    stale = []
+    for path, text in outputs().items():
+        current = path.read_text(encoding="utf-8") if path.exists() else None
+        if current == text:
+            continue
+        if args.check:
+            stale.append(path.relative_to(ROOT))
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text, encoding="utf-8")
+            print(f"wrote {path.relative_to(ROOT)}")
+    if stale:
+        sys.exit("stale generated queries: " + ", ".join(map(str, stale)))
+
+
+if __name__ == "__main__":
+    main()

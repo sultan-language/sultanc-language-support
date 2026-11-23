@@ -1,0 +1,696 @@
+:root {
+    color-scheme: light dark;
+    --sultanc-font-size: var(--vscode-editor-font-size);
+    --sultanc-line-height: 1.65;
+    --sultanc-font-family: "IBM Plex Sans Arabic", "SF Arabic", "Noto Sans Arabic", var(--vscode-editor-font-family), "Geeza Pro", sans-serif;
+    --gutter-width: 58px;
+
+    /* Safe defaults; theme-specific palettes override these below. */
+    --syn-control: #c678dd;
+    --syn-declaration: #61afef;
+    --syn-module: #56b6c2;
+    --syn-modifier: #e5c07b;
+    --syn-type: #56b6c2;
+    --syn-word-operator: #c678dd;
+    --syn-special: #e5c07b;
+    --syn-keyword: #c678dd;
+    --syn-literal: #d19a66;
+    --syn-reserved: #e06c75;
+    --syn-string: #98c379;
+    --syn-number: #d19a66;
+    --syn-comment: #7f848e;
+    --syn-operator: #abb2bf;
+    --syn-function: #61afef;
+    --syn-type-name: #e5c07b;
+    --syn-variable: #e5c07b;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--vscode-editor-background);
+    color: var(--vscode-editor-foreground);
+}
+
+body {
+    display: grid;
+    grid-template-rows: 22px minmax(0, 1fr) 24px;
+    font-family: var(--vscode-font-family);
+}
+
+/* Restrained Nvim/terminal-inspired colors: readable, low saturation, no bold
+   token styling so the transparent textarea stays pixel-aligned with overlay. */
+body.vscode-dark[data-palette="nvim"],
+body.vscode-high-contrast[data-palette="nvim"] {
+    --syn-control: #c678dd;
+    --syn-declaration: #61afef;
+    --syn-module: #56b6c2;
+    --syn-modifier: #e5c07b;
+    --syn-type: #56b6c2;
+    --syn-word-operator: #c678dd;
+    --syn-special: #e5c07b;
+    --syn-keyword: #c678dd;
+    --syn-literal: #d19a66;
+    --syn-reserved: #e06c75;
+    --syn-string: #98c379;
+    --syn-number: #d19a66;
+    --syn-comment: #7f848e;
+    --syn-operator: #abb2bf;
+    --syn-function: #61afef;
+    --syn-type-name: #e5c07b;
+    --syn-variable: #e5c07b;
+}
+
+body.vscode-light[data-palette="nvim"],
+body.vscode-high-contrast-light[data-palette="nvim"] {
+    --syn-control: #7c3aed;
+    --syn-declaration: #2563eb;
+    --syn-module: #0e7490;
+    --syn-modifier: #a16207;
+    --syn-type: #0e7490;
+    --syn-word-operator: #7c3aed;
+    --syn-special: #a16207;
+    --syn-keyword: #7c3aed;
+    --syn-literal: #b45309;
+    --syn-reserved: #b91c1c;
+    --syn-string: #3f7d20;
+    --syn-number: #b45309;
+    --syn-comment: #6b7280;
+    --syn-operator: #374151;
+    --syn-function: #2563eb;
+    --syn-type-name: #a16207;
+    --syn-variable: #92400e;
+}
+
+/* Optional theme-following palette. Fallbacks preserve legibility when a VS
+   Code theme does not expose a particular symbol color variable. */
+body[data-palette="vscode"] {
+    --syn-control: var(--vscode-symbolIcon-keywordForeground, #c678dd);
+    --syn-declaration: var(--vscode-symbolIcon-functionForeground, #61afef);
+    --syn-module: var(--vscode-symbolIcon-moduleForeground, #56b6c2);
+    --syn-modifier: var(--vscode-symbolIcon-keyForeground, #e5c07b);
+    --syn-type: var(--vscode-symbolIcon-typeParameterForeground, #56b6c2);
+    --syn-word-operator: var(--vscode-symbolIcon-operatorForeground, #c678dd);
+    --syn-special: var(--vscode-symbolIcon-eventForeground, #e5c07b);
+    --syn-keyword: var(--vscode-symbolIcon-keywordForeground, #c678dd);
+    --syn-literal: var(--vscode-symbolIcon-booleanForeground, #d19a66);
+    --syn-reserved: var(--vscode-errorForeground, #e06c75);
+    --syn-string: var(--vscode-symbolIcon-stringForeground, #98c379);
+    --syn-number: var(--vscode-symbolIcon-numberForeground, #d19a66);
+    --syn-comment: var(--vscode-descriptionForeground, #7f848e);
+    --syn-operator: var(--vscode-editor-foreground);
+    --syn-function: var(--vscode-symbolIcon-functionForeground, #61afef);
+    --syn-type-name: var(--vscode-symbolIcon-classForeground, #e5c07b);
+    --syn-variable: var(--vscode-symbolIcon-variableForeground, #e5c07b);
+}
+
+.editor-shell {
+    min-height: 0;
+    min-width: 0;
+    display: grid;
+    background: var(--vscode-editor-background);
+}
+
+.editor-shell[data-direction="ltr"] {
+    grid-template-columns: var(--gutter-width) minmax(0, 1fr);
+    grid-template-areas: "lines editor";
+}
+
+.editor-shell[data-direction="rtl"] {
+    grid-template-columns: minmax(0, 1fr) var(--gutter-width);
+    grid-template-areas: "editor lines";
+}
+
+.editor-shell[data-line-numbers="false"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "editor";
+}
+
+.editor-shell[data-line-numbers="false"] .lines {
+    display: none;
+}
+
+.editor-stack {
+    grid-area: editor;
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.lines {
+    grid-area: lines;
+    margin: 0;
+    padding: 14px 8px 40vh;
+    overflow: hidden;
+    color: var(--vscode-editorLineNumber-foreground);
+    background: var(--vscode-editorGutter-background, var(--vscode-editor-background));
+    user-select: none;
+    white-space: pre;
+    direction: ltr;
+    text-align: right;
+    font-family: var(--vscode-editor-font-family), ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--sultanc-font-size);
+    font-weight: var(--vscode-editor-font-weight);
+    line-height: var(--sultanc-line-height);
+    font-variant-ligatures: none;
+}
+
+.editor-shell[data-direction="ltr"] .lines {
+    border-right: 1px solid var(--vscode-editorWidget-border, rgba(127, 127, 127, 0.25));
+}
+
+.editor-shell[data-direction="rtl"] .lines {
+    border-left: 1px solid var(--vscode-editorWidget-border, rgba(127, 127, 127, 0.25));
+    text-align: left;
+}
+
+#highlight,
+#diagnostics-overlay,
+#editor {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 14px 20px 40vh;
+    border: 0;
+    outline: 0;
+    overflow: auto;
+    white-space: pre;
+    tab-size: 4;
+    text-align: start;
+    unicode-bidi: plaintext;
+    font-family: var(--sultanc-font-family);
+    font-size: var(--sultanc-font-size);
+    font-weight: var(--vscode-editor-font-weight);
+    line-height: var(--sultanc-line-height);
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    letter-spacing: normal;
+}
+
+#highlight {
+    pointer-events: none;
+    color: var(--vscode-editor-foreground);
+    background: transparent;
+    scrollbar-width: none;
+    overflow: hidden;
+}
+
+#highlight::-webkit-scrollbar {
+    display: none;
+}
+
+#diagnostics-overlay {
+    z-index: 1;
+    pointer-events: none;
+    color: transparent;
+    background: transparent;
+    scrollbar-width: none;
+    overflow: hidden;
+}
+
+#diagnostics-overlay::-webkit-scrollbar {
+    display: none;
+}
+
+#diagnostics-overlay .diagnostic-span {
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-thickness: from-font;
+    text-underline-offset: 3px;
+}
+
+#diagnostics-overlay .diagnostic-error {
+    text-decoration-color: var(--vscode-editorError-foreground, var(--vscode-errorForeground));
+}
+
+#diagnostics-overlay .diagnostic-warning {
+    text-decoration-color: var(--vscode-editorWarning-foreground);
+}
+
+#diagnostics-overlay .diagnostic-info {
+    text-decoration-color: var(--vscode-editorInfo-foreground);
+}
+
+#editor {
+    resize: none;
+    z-index: 2;
+    background: transparent;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    caret-color: var(--vscode-editorCursor-foreground);
+}
+
+#editor::selection {
+    background: var(--vscode-editor-selectionBackground);
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 10px;
+    border-top: 1px solid var(--vscode-editorWidget-border, rgba(127, 127, 127, 0.25));
+    background: var(--vscode-editor-background);
+    color: var(--vscode-descriptionForeground);
+    direction: ltr;
+    font-size: 11px;
+    user-select: none;
+}
+
+.status .spacer {
+    flex: 1;
+}
+
+.syntax-control { color: var(--syn-control); }
+.syntax-declaration { color: var(--syn-declaration); }
+.syntax-module { color: var(--syn-module); }
+.syntax-modifier { color: var(--syn-modifier); }
+.syntax-type { color: var(--syn-type); }
+.syntax-wordOperator { color: var(--syn-word-operator); }
+.syntax-special { color: var(--syn-special); }
+.syntax-keyword { color: var(--syn-keyword); }
+.syntax-literal { color: var(--syn-literal); }
+.syntax-reserved { color: var(--syn-reserved); }
+.syntax-string { color: var(--syn-string); }
+.syntax-number { color: var(--syn-number); }
+.syntax-comment { color: var(--syn-comment); font-style: italic; }
+.syntax-operator { color: var(--syn-operator); }
+.syntax-function { color: var(--syn-function); }
+.syntax-typeName { color: var(--syn-type-name); }
+.syntax-variable { color: var(--syn-variable); }
+
+
+/*
+ * Programming punctuation is not prose. In an RTL paragraph Unicode bidi
+ * mirroring can visually swap paired delimiters (for example `{` and `}`).
+ * The syntax renderer wraps exact-source operators/numerals in LTR isolates so
+ * their glyphs stay byte-faithful without injecting control characters into
+ * the document itself.
+ */
+.syntax-technical {
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+/*
+ * `->` is the canonical SultanC source token in both source languages. In an
+ * Arabic RTL line its presentation must point toward the continuation on the
+ * left, while the underlying DOM/source text remains the exact two bytes `->`.
+ * Mirroring only the rendered atom keeps caret/source offsets unchanged.
+ */
+.syntax-rtl-arrow {
+    display: inline-block;
+    transform: scaleX(-1);
+    transform-origin: center;
+}
+
+/* Latin identifiers/functions remain one LTR run when embedded in RTL code. */
+.syntax-ltr-identifier {
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+/* `hidden` must win over a popup's own `display` (the completion list is a
+   flex box): a hidden popup is not drawn at all, not even its border. */
+.lsp-popup[hidden],
+.lsp-peek[hidden] {
+    display: none !important;
+}
+
+.lsp-popup {
+    position: fixed;
+    z-index: 50;
+    max-width: min(620px, calc(100vw - 24px));
+    max-height: min(320px, calc(100vh - 48px));
+    overflow: auto;
+    border: 1px solid var(--vscode-editorWidget-border, rgba(127, 127, 127, 0.35));
+    border-radius: 4px;
+    background: var(--vscode-editorHoverWidget-background, var(--vscode-editor-background));
+    color: var(--vscode-editorHoverWidget-foreground, var(--vscode-editor-foreground));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+    font-family: var(--vscode-editor-font-family), ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--vscode-editor-font-size);
+    line-height: 1.45;
+    direction: auto;
+    unicode-bidi: plaintext;
+}
+
+.lsp-signature {
+    padding: 8px 10px;
+    white-space: pre-wrap;
+    user-select: text;
+}
+
+/* Hover renders LSP Markdown (see media/markdown.js), matching VS Code's widget. */
+.lsp-hover {
+    padding: 4px 10px;
+    user-select: text;
+    pointer-events: auto;
+    font-family: var(--vscode-font-family), system-ui, sans-serif;
+}
+
+.lsp-hover p {
+    margin: 6px 0;
+    unicode-bidi: plaintext;
+}
+
+.lsp-hover pre {
+    margin: 6px 0;
+    padding: 0;
+    white-space: pre-wrap;
+    font-family: var(--vscode-editor-font-family), ui-monospace, monospace;
+    unicode-bidi: plaintext;
+}
+
+.lsp-hover code {
+    font-family: var(--vscode-editor-font-family), ui-monospace, monospace;
+    background: var(--vscode-textCodeBlock-background, rgba(127, 127, 127, 0.15));
+    border-radius: 3px;
+    padding: 0 3px;
+    unicode-bidi: isolate;
+}
+
+.lsp-hover pre code {
+    background: none;
+    padding: 0;
+}
+
+.lsp-hover hr {
+    border: none;
+    border-top: 1px solid var(--vscode-editorHoverWidget-border, rgba(127, 127, 127, 0.35));
+    margin: 4px -10px;
+}
+
+.lsp-hover a {
+    color: var(--vscode-textLink-foreground);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.lsp-hover-diagnostics {
+    padding: 6px 0;
+    color: var(--vscode-editorError-foreground, inherit);
+    border-bottom: 1px solid var(--vscode-editorHoverWidget-border, rgba(127, 127, 127, 0.35));
+}
+
+/* ---- Completion list ----------------------------------------------------
+   VS Code's suggest-widget and symbol-icon theme colours only; a translucent
+   surface, rows with kind icons, typed letters marked, and a details pane for
+   the selected item. */
+.lsp-completion {
+    display: flex;
+    flex-direction: column;
+    min-width: 280px;
+    max-width: min(520px, calc(100vw - 24px));
+    max-height: none;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid var(--vscode-editorSuggestWidget-border, var(--vscode-editorWidget-border, rgba(127, 127, 127, 0.28)));
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--vscode-editorSuggestWidget-background, var(--vscode-editorWidget-background, var(--vscode-editor-background))) 90%, transparent);
+    color: var(--vscode-editorSuggestWidget-foreground, var(--vscode-editor-foreground));
+    -webkit-backdrop-filter: blur(16px) saturate(1.15);
+    backdrop-filter: blur(16px) saturate(1.15);
+    box-shadow: 0 14px 36px -10px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.16);
+    transform-origin: top center;
+}
+
+.lsp-completion.lsp-completion-opening {
+    animation: lsp-completion-in 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes lsp-completion-in {
+    from { opacity: 0; transform: translateY(-4px) scale(0.985); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lsp-completion.lsp-completion-opening { animation: none; }
+}
+
+.lsp-completion-list {
+    max-height: calc(10 * 26px + 8px);
+    overflow-y: auto;
+    padding: 4px;
+    scrollbar-width: thin;
+}
+
+.lsp-completion-item {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 9px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 6px;
+    cursor: default;
+    white-space: nowrap;
+    transition: background-color 90ms ease;
+}
+
+.lsp-completion-item:hover {
+    background: var(--vscode-editorSuggestWidget-hoverBackground, var(--vscode-list-hoverBackground));
+}
+
+.lsp-completion-item[data-active="true"] {
+    background: var(--vscode-editorSuggestWidget-selectedBackground, var(--vscode-list-activeSelectionBackground));
+    color: var(--vscode-editorSuggestWidget-selectedForeground, var(--vscode-list-activeSelectionForeground, inherit));
+}
+
+.lsp-completion-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    color: var(--vscode-symbolIcon-textForeground, var(--vscode-editor-foreground));
+    background: color-mix(in srgb, currentColor 13%, transparent);
+}
+
+.lsp-completion-icon svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.lsp-completion-icon[data-kind="function"],
+.lsp-completion-icon[data-kind="method"],
+.lsp-completion-icon[data-kind="constructor"] { color: var(--vscode-symbolIcon-functionForeground, #b180d7); }
+.lsp-completion-icon[data-kind="variable"] { color: var(--vscode-symbolIcon-variableForeground, #75beff); }
+.lsp-completion-icon[data-kind="field"],
+.lsp-completion-icon[data-kind="property"] { color: var(--vscode-symbolIcon-fieldForeground, #75beff); }
+.lsp-completion-icon[data-kind="struct"],
+.lsp-completion-icon[data-kind="class"] { color: var(--vscode-symbolIcon-structForeground, #ee9d28); }
+.lsp-completion-icon[data-kind="interface"] { color: var(--vscode-symbolIcon-interfaceForeground, #75beff); }
+.lsp-completion-icon[data-kind="enum"] { color: var(--vscode-symbolIcon-enumeratorForeground, #ee9d28); }
+.lsp-completion-icon[data-kind="enumMember"] { color: var(--vscode-symbolIcon-enumeratorMemberForeground, #75beff); }
+.lsp-completion-icon[data-kind="module"] { color: var(--vscode-symbolIcon-moduleForeground, var(--vscode-editor-foreground)); }
+.lsp-completion-icon[data-kind="keyword"] { color: var(--vscode-symbolIcon-keywordForeground, var(--vscode-editor-foreground)); }
+.lsp-completion-icon[data-kind="constant"],
+.lsp-completion-icon[data-kind="value"] { color: var(--vscode-symbolIcon-constantForeground, var(--vscode-editor-foreground)); }
+.lsp-completion-icon[data-kind="typeParameter"] { color: var(--vscode-symbolIcon-typeParameterForeground, var(--vscode-editor-foreground)); }
+.lsp-completion-icon[data-kind="snippet"] { color: var(--vscode-symbolIcon-snippetForeground, var(--vscode-editor-foreground)); }
+
+.lsp-completion-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    unicode-bidi: plaintext;
+}
+
+.lsp-completion-match {
+    color: var(--vscode-editorSuggestWidget-highlightForeground, var(--vscode-list-highlightForeground, inherit));
+}
+
+.lsp-completion-item[data-active="true"] .lsp-completion-match {
+    color: var(--vscode-editorSuggestWidget-focusHighlightForeground, var(--vscode-editorSuggestWidget-highlightForeground, inherit));
+}
+
+.lsp-completion-detail {
+    overflow: hidden;
+    max-width: 220px;
+    text-overflow: ellipsis;
+    color: var(--vscode-descriptionForeground);
+    font-family: var(--vscode-font-family), system-ui, sans-serif;
+    font-size: 0.9em;
+    font-weight: 300;
+    unicode-bidi: plaintext;
+    opacity: 0.9;
+}
+
+/* Arabic text needs more size than Latin to stay readable. */
+.lsp-completion[dir="rtl"] .lsp-completion-detail { font-size: 0.95em; }
+
+.lsp-completion-item[data-active="true"] .lsp-completion-detail { opacity: 1; }
+
+.lsp-completion-auto-import {
+    font-family: var(--vscode-editor-font-family), ui-monospace, monospace;
+    font-size: 0.82em;
+}
+
+.lsp-completion-details {
+    max-height: 180px;
+    overflow-y: auto;
+    padding: 8px 12px 10px;
+    border-top: 1px solid var(--vscode-editorSuggestWidget-border, var(--vscode-editorWidget-border, rgba(127, 127, 127, 0.22)));
+    font-size: 0.92em;
+}
+
+.lsp-completion-details[hidden] { display: none; }
+
+.lsp-completion-signature,
+.lsp-completion-import {
+    white-space: pre-wrap;
+    unicode-bidi: plaintext;
+}
+
+.lsp-completion-import {
+    color: var(--vscode-descriptionForeground);
+}
+
+.lsp-completion-docs {
+    margin-top: 6px;
+    font-family: var(--vscode-font-family), system-ui, sans-serif;
+    font-weight: 300;
+    color: var(--vscode-descriptionForeground);
+}
+
+.lsp-completion-docs p { margin: 0 0 4px; }
+
+.lines .diagnostic-error { color: var(--vscode-errorForeground); }
+.lines .diagnostic-warning { color: var(--vscode-editorWarning-foreground, #cca700); }
+.lines .diagnostic-info { color: var(--vscode-editorInfo-foreground, #3794ff); }
+
+#diagnostic-count[data-severity="error"] { color: var(--vscode-errorForeground); }
+#diagnostic-count[data-severity="warning"] { color: var(--vscode-editorWarning-foreground, #cca700); }
+
+/* Breadcrumbs: VS Code's own breadcrumb colors and the UI font. */
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    background: var(--vscode-breadcrumb-background, var(--vscode-editor-background));
+    color: var(--vscode-breadcrumb-foreground, var(--vscode-descriptionForeground));
+    font-family: var(--vscode-font-family);
+    font-size: 12px;
+    user-select: none;
+}
+
+.breadcrumb {
+    unicode-bidi: isolate;
+}
+
+.breadcrumb-symbol {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.breadcrumb-symbol:hover,
+.breadcrumb-symbol:focus-visible {
+    color: var(--vscode-breadcrumb-focusForeground, var(--vscode-editor-foreground));
+    outline: none;
+}
+
+.breadcrumb-separator {
+    opacity: 0.7;
+}
+
+/* Peek Definition, drawn like VS Code's peek view: a band across the editor. */
+/* `display: grid` below would otherwise override the hidden attribute. */
+.lsp-peek[hidden] {
+    display: none;
+}
+
+.lsp-peek {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    max-height: 42vh;
+    display: grid;
+    grid-template-rows: 22px minmax(0, 1fr);
+    border-top: 2px solid var(--vscode-peekView-border, var(--vscode-focusBorder));
+    border-bottom: 2px solid var(--vscode-peekView-border, var(--vscode-focusBorder));
+    background: var(--vscode-peekViewEditor-background, var(--vscode-editor-background));
+}
+
+.lsp-peek-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    background: var(--vscode-peekViewTitle-background, var(--vscode-editor-background));
+    color: var(--vscode-peekViewTitleLabel-foreground, var(--vscode-editor-foreground));
+    font-family: var(--vscode-font-family);
+    font-size: 12px;
+}
+
+.lsp-peek-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lsp-peek-action {
+    padding: 0 4px;
+    border: 0;
+    background: none;
+    color: var(--vscode-textLink-foreground);
+    font: inherit;
+    cursor: pointer;
+}
+
+.lsp-peek-body {
+    overflow: auto;
+    padding: 4px 0;
+    font-family: var(--sultanc-font-family);
+    font-size: calc(var(--sultanc-font-size) * 1);
+    line-height: var(--sultanc-line-height);
+}
+
+.lsp-peek-line {
+    display: flex;
+    gap: 12px;
+    padding: 0 10px;
+    white-space: pre;
+}
+
+.lsp-peek-target {
+    background: var(--vscode-peekViewEditor-matchHighlightBackground, var(--vscode-editor-selectionHighlightBackground));
+}
+
+.lsp-peek-number {
+    min-width: 3em;
+    color: var(--vscode-editorLineNumber-foreground);
+    text-align: end;
+    direction: ltr;
+}
+
+.lsp-peek-code {
+    flex: 1;
+}

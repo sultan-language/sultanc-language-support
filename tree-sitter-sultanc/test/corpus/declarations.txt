@@ -1,0 +1,240 @@
+============================================================
+Arabic function with public visibility
+============================================================
+
+عام عرف الأكبر(أ: عدد, ب: عدد): عدد {
+    إذا (أ > ب) { أرجع أ; };
+    أرجع ب;
+}
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (visibility)
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (primitive_type)
+    (block
+      (if_statement
+        (binary_expression
+          (identifier)
+          (identifier))
+        (block
+          (return_statement
+            (identifier))))
+      (return_statement
+        (identifier)))))
+
+============================================================
+English function
+============================================================
+
+def main(): int {
+    return 0;
+}
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters)
+    (primitive_type)
+    (block
+      (return_statement
+        (integer)))))
+
+============================================================
+Generic function with aliases
+============================================================
+
+def identity<T> alias same, هو(value: T): T { return value; }
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (type_parameters
+      (identifier))
+    (identifier)
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (named_type
+          (path
+            (identifier)))))
+    (named_type
+      (path
+        (identifier)))
+    (block
+      (return_statement
+        (identifier)))))
+
+============================================================
+Extern function with library and link name
+============================================================
+
+extern "libc" def write_bytes(fd: int, data: *u8, n: uint): int = "write";
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (string)
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (pointer_type
+          (primitive_type)))
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (primitive_type)
+    (string)))
+
+============================================================
+Record type
+============================================================
+
+type Point = { x: int, y: int };
+
+------------------------------------------------------------
+
+(source_file
+  (type_declaration
+    (identifier)
+    (record_type
+      (field_declaration
+        (identifier)
+        (primitive_type))
+      (field_declaration
+        (identifier)
+        (primitive_type)))))
+
+============================================================
+Enum type with payloads
+============================================================
+
+نوع شكل =
+    | دائرة بنوع عدد
+    | مستطيل بنوع (عدد, عدد)
+    | نقطة
+;
+
+------------------------------------------------------------
+
+(source_file
+  (type_declaration
+    (identifier)
+    (enum_type
+      (enum_variant
+        (identifier)
+        (primitive_type))
+      (enum_variant
+        (identifier)
+        (payload_list)
+        (payload_list
+          (primitive_type))
+        (payload_list
+          (primitive_type))
+        (payload_list))
+      (enum_variant
+        (identifier)))))
+
+============================================================
+Constructor alias
+============================================================
+
+عام مرادف لون.داكن = لون.أحمر;
+
+------------------------------------------------------------
+
+(source_file
+  (alias_declaration
+    (visibility)
+    (path
+      (identifier)
+      (identifier))
+    (path
+      (identifier)
+      (identifier))))
+
+============================================================
+Module constant
+============================================================
+
+let limit: int = 100;
+
+------------------------------------------------------------
+
+(source_file
+  (const_declaration
+    (identifier)
+    (primitive_type)
+    (integer)))
+
+============================================================
+Attribute
+============================================================
+
+@test
+def check(): void { }
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (attribute
+      (path
+        (identifier)))
+    (identifier)
+    (parameters)
+    (primitive_type)
+    (block)))
+
+============================================================
+Target conditional
+============================================================
+
+if (os == linux) {
+    def name(): string { return "linux"; }
+} else {
+    def name(): string { return "other"; }
+};
+
+------------------------------------------------------------
+
+(source_file
+  (target_conditional
+    (binary_expression
+      (identifier)
+      (identifier))
+    (item_block
+      (function_declaration
+        (identifier)
+        (parameters)
+        (primitive_type)
+        (block
+          (return_statement
+            (string)))))
+    (item_block
+      (function_declaration
+        (identifier)
+        (parameters)
+        (primitive_type)
+        (block
+          (return_statement
+            (string)))))))

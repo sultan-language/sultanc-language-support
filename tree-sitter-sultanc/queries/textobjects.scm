@@ -1,0 +1,15 @@
+; nvim-treesitter-textobjects captures (Helix/Zed copies are renamed).
+(function_declaration body: (block) @function.inner) @function.outer
+(closure_expression body: (_) @function.inner) @function.outer
+(type_declaration value: (_) @class.inner) @class.outer
+(parameter) @parameter.inner
+(closure_parameter) @parameter.inner
+(arguments (_) @parameter.inner)
+(comment) @comment.outer
+(block) @block.outer
+(while_statement body: (block) @loop.inner) @loop.outer
+(for_statement body: (block) @loop.inner) @loop.outer
+(if_statement consequence: (block) @conditional.inner) @conditional.outer
+(match_arm body: (block) @conditional.inner) @conditional.outer
+(call_expression) @call.outer
+(return_statement) @return.outer

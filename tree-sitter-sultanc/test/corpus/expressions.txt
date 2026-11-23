@@ -1,0 +1,200 @@
+============================================================
+Closure and function type
+============================================================
+
+def make(amount: int): fn(int): int {
+    return fn(value: int): int -> value + amount;
+}
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (function_type
+      (primitive_type)
+      (primitive_type))
+    (block
+      (return_statement
+        (closure_expression
+          (closure_parameters
+            (closure_parameter
+              (identifier)
+              (primitive_type)))
+          (primitive_type)
+          (binary_expression
+            (identifier)
+            (identifier)))))))
+
+============================================================
+Cast binds tighter than unary minus
+============================================================
+
+def f(b: u8): i64 { return -b as i64 * 2; }
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (primitive_type)
+    (block
+      (return_statement
+        (binary_expression
+          (unary_expression
+            (cast_expression
+              (identifier)
+              (primitive_type)))
+          (integer))))))
+
+============================================================
+Propagation with Arabic question mark
+============================================================
+
+عرف ف(): نتيجة عدد, نص { ليكن ق: عدد = قسمة(1, 2)؟; أرجع نتيجة.نجح(ق); }
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters)
+    (result_type
+      (type_constructor)
+      (primitive_type)
+      (primitive_type))
+    (block
+      (let_statement
+        (identifier)
+        (primitive_type)
+        (try_expression
+          (call_expression
+            (identifier)
+            (arguments
+              (integer)
+              (integer)))))
+      (return_statement
+        (call_expression
+          (field_expression
+            (identifier)
+            (identifier))
+          (arguments
+            (identifier)))))))
+
+============================================================
+Nested generic arguments close with >>
+============================================================
+
+def work(m: &arc<mutex<i64>>): void { }
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (reference_type
+          (named_type
+            (path
+              (identifier))
+            (type_arguments
+              (named_type
+                (path
+                  (identifier))
+                (type_arguments
+                  (primitive_type))))))))
+    (primitive_type)
+    (block)))
+
+============================================================
+Tuple, box, vector and record initializers
+============================================================
+
+def f(): void {
+    let p: (int, int) = (3, 4);
+    let b: box int = box 40;
+    let v: vector int = [1, 2];
+    let r: Point = { x: 1, y: 2 };
+}
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters)
+    (primitive_type)
+    (block
+      (let_statement
+        (identifier)
+        (tuple_type
+          (primitive_type)
+          (primitive_type))
+        (tuple_expression
+          (integer)
+          (integer)))
+      (let_statement
+        (identifier)
+        (box_type
+          (primitive_type))
+        (box_expression
+          (integer)))
+      (let_statement
+        (identifier)
+        (vector_type
+          (type_constructor)
+          (primitive_type))
+        (vector_expression
+          (integer)
+          (integer)))
+      (let_statement
+        (identifier)
+        (named_type
+          (path
+            (identifier)))
+        (record_expression
+          (field_initializer
+            (identifier)
+            (integer))
+          (field_initializer
+            (identifier)
+            (integer)))))))
+
+============================================================
+Keyword words after a dot are names
+============================================================
+
+def f(): result int, int { return result.err(error.false()); }
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters)
+    (result_type
+      (type_constructor)
+      (primitive_type)
+      (primitive_type))
+    (block
+      (return_statement
+        (call_expression
+          (field_expression
+            (identifier)
+            (identifier))
+          (arguments
+            (call_expression
+              (field_expression
+                (identifier)
+                (identifier))
+              (arguments))))))))

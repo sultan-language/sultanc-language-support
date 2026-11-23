@@ -1,0 +1,124 @@
+============================================================
+Nested raw strings keep quotes and backslashes
+============================================================
+
+let s: string = «a «b» \n "c"»;
+
+------------------------------------------------------------
+
+(source_file
+  (const_declaration
+    (identifier)
+    (primitive_type)
+    (raw_string)))
+
+============================================================
+Escapes in strings and characters
+============================================================
+
+let s: string = "tab\t\u0041\x41";
+let c: char = '\n';
+
+------------------------------------------------------------
+
+(source_file
+  (const_declaration
+    (identifier)
+    (primitive_type)
+    (string
+      (escape_sequence)
+      (escape_sequence)
+      (escape_sequence)))
+  (const_declaration
+    (identifier)
+    (primitive_type)
+    (character
+      (escape_sequence))))
+
+============================================================
+Numbers
+============================================================
+
+let a: int = 0x_ff + 0b1010 + 1_000;
+let f: f64 = 1.5e3;
+
+------------------------------------------------------------
+
+(source_file
+  (const_declaration
+    (identifier)
+    (primitive_type)
+    (binary_expression
+      (binary_expression
+        (integer)
+        (integer))
+      (integer)))
+  (const_declaration
+    (identifier)
+    (primitive_type)
+    (float)))
+
+============================================================
+Alef variants and deprecated spellings are canonical keywords
+============================================================
+
+عرف ف(): عدد {
+    إرجع 7;
+}
+عرف ك(): غ8 {
+    بينما (صواب) { اخرج_من_حلقة; }
+    أرجع 0;
+}
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters)
+    (primitive_type)
+    (block
+      (return_statement
+        (integer))))
+  (function_declaration
+    (identifier)
+    (parameters)
+    (primitive_type)
+    (block
+      (while_statement
+        (boolean)
+        (block
+          (break_statement)))
+      (return_statement
+        (integer)))))
+
+============================================================
+Keyword prefix inside an identifier
+============================================================
+
+ليكن دالة_مسير: عدد = 1;
+
+------------------------------------------------------------
+
+(source_file
+  (const_declaration
+    (identifier)
+    (primitive_type)
+    (integer)))
+
+============================================================
+Unicode separators and direction marks
+============================================================
+
+def main():‏ int { return 0; }
+
+------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameters)
+    (primitive_type)
+    (block
+      (return_statement
+        (integer)))))

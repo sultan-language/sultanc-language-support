@@ -1,0 +1,22 @@
+{
+  "grammars": [
+    {
+      "name": "sultanc",
+      "camelcase": "SultanC",
+      "scope": "source.sultanc",
+      "path": ".",
+      "file-types": ["sn"],
+      "highlights": "queries/highlights.scm",
+      "locals": "queries/locals.scm",
+      "tags": "queries/tags.scm",
+      "injection-regex": "^(sultanc|sn)$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "SultanC grammar for tree-sitter (Arabic and English surfaces)",
+    "links": { "repository": "https://github.com/sultanc-lang/sultanc-language-support" }
+  },
+  "bindings": { "c": true, "node": false, "python": false, "rust": false, "go": false, "swift": false }
+}

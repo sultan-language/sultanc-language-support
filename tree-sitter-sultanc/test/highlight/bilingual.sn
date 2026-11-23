@@ -1,0 +1,32 @@
+عام عرف الأكبر(أ: عدد, ب: عدد): عدد {
+// <- keyword.modifier
+//   ^ keyword.function
+//       ^ function
+//             ^ variable.parameter
+//                ^ type.builtin
+    إذا (أ > ب) { أرجع أ; };
+//  ^ keyword.conditional
+//                ^ keyword.return
+    أرجع ب;
+}
+
+def main(): int {
+// <- keyword.function
+//  ^ function
+//          ^ type.builtin
+    let total: mutable vector int = [1, 2];
+//  ^ keyword
+//             ^ keyword.modifier
+//                     ^ type.builtin
+    match first(&total) with
+//  ^ keyword.conditional
+//        ^ function.call
+//                      ^ keyword.conditional
+    | option.some(x) -> { return x; }
+//           ^ constructor
+    | option.none -> { };
+    let s: string = «raw \n»;
+//                  ^ string
+    return 0;
+//  ^ keyword.return
+}

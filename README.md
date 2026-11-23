@@ -9,6 +9,12 @@ This repository owns the reusable syntax/highlighting metadata consumed by edito
 ```text
 grammars/
   sultanc.tmLanguage.json      TextMate grammar for SultanC
+tree-sitter-sultanc/           tree-sitter grammar, scanner, canonical queries, corpus
+editors/
+  vscode/                      VS Code extension
+  zed/                         Zed extension (grammar + sultanc-lsp)
+  neovim/                      Neovim plugin (filetype, queries, LSP setup)
+  helix/                       Helix languages.toml and queries
 metadata/
   language.json                editor-neutral language identity
   syntax-surface.json          generated lexical presentation surface
@@ -17,9 +23,12 @@ linguist/
   README.md                    upstream Linguist integration notes
 tools/
   generate-syntax.py           deterministic generator
+  generate-tree-sitter-queries.py  editor query copies from tree-sitter-sultanc/queries
   sync-from-compiler.sh        refresh generated syntax assets from sultanc
- tests/
+tests/
   verify_language_support.py   consistency checks
+  verify_tree_sitter.py        grammar fixtures, incremental reparse, whole-checkout parse
+  editors/neovim_test.lua      headless Neovim: highlights, folds, sultanc-lsp diagnostics
 ```
 
 ## Source of truth
@@ -37,6 +46,7 @@ python3 tests/verify_language_support.py
 
 - `sultanc-vscode` stages the grammar and syntax surface when testing/packaging.
 - GitHub Linguist submission material lives under `linguist/`.
+- `tree-sitter-sultanc/grammar.js` reads keyword spellings from `metadata/syntax-surface.json`; Zed, Neovim and Helix use its generated queries.
 - Future editor integrations should consume these assets rather than maintain their own SultanC keyword/operator tables.
 
 ## String forms

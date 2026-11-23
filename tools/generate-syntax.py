@@ -19,6 +19,8 @@ TOKEN_RE = re.compile(r'^SULTANC__TOKEN__\(\s*([A-Z0-9_]+)\s*,\s*"([^"]*)"\s*,\s
 KEYWORD_RE = re.compile(r'^SULTANC__KEYWORD__\(\s*([A-Z0-9_]+)\s*,\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)')
 BOOL_RE = re.compile(r'^SULTANC__BOOL_KEYWORD__\(\s*"([^"]*)"\s*,\s*"([^"]*)"\s*,\s*([01])\s*\)')
 OPERATOR_RE = re.compile(r'^SULTANC__OPERATOR__\(\s*([A-Z0-9_]+)\s*,\s*"([^"]*)"\s*\)')
+NORMALIZED_RE = re.compile(r'SULTANC__IDENTIFIER_NORMALIZED_SCALAR__\(0x([0-9A-Fa-f]+),\s*0x([0-9A-Fa-f]+)\)')
+DEPRECATED_RE = re.compile(r'^SULTANC__KEYWORD_DEPRECATED__\(\s*([A-Z0-9_]+)\s*,\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)')
 IGNORED_RE = re.compile(r'SULTANC__IDENTIFIER_IGNORED_SCALAR__\(0x([0-9A-Fa-f]+)\)')
 START_RANGE_RE = re.compile(r'SULTANC__IDENTIFIER_START_RANGE__\(0x([0-9A-Fa-f]+),\s*0x([0-9A-Fa-f]+)\)')
 START_SCALAR_RE = re.compile(r'SULTANC__IDENTIFIER_START_SCALAR__\(0x([0-9A-Fa-f]+)\)')
@@ -76,6 +78,7 @@ def parse_identifier_policy(path: Path) -> dict:
         "source": source,
         "sha256": sha256_text(source),
         "ignored": parse_scalars(IGNORED_RE, source),
+        "normalized": parse_ranges(NORMALIZED_RE, source),
         "startRanges": start_ranges,
         "startScalars": start_scalars,
         "restRanges": parse_ranges(REST_RANGE_RE, source),
@@ -89,6 +92,7 @@ def parse_registry(path: Path, policy: dict) -> dict:
     keywords: list[dict] = []
     booleans: list[dict] = []
     operators: list[dict] = []
+    deprecated: list[dict] = []
 
     for raw in source.splitlines():
         line = raw.strip()
@@ -107,6 +111,9 @@ def parse_registry(path: Path, policy: dict) -> dict:
         elif match := BOOL_RE.match(line):
             english, arabic, value = match.groups()
             booleans.append({"english": english, "arabic": arabic, "value": int(value)})
+        elif match := DEPRECATED_RE.match(line):
+            name, old, canonical = match.groups()
+            deprecated.append({"token": name, "spelling": old, "canonical": canonical})
         elif match := OPERATOR_RE.match(line):
             name, spelling = match.groups()
             operators.append({"token": name, "spelling": spelling})
@@ -159,12 +166,14 @@ def parse_registry(path: Path, policy: dict) -> dict:
         },
         "identifierPolicy": {
             "ignoredCodepoints": policy["ignored"],
+            "normalizedCodepoints": [{"from": a, "to": b} for a, b in policy["normalized"]],
             "startRanges": range_objects(policy["startRanges"]),
             "startScalars": policy["startScalars"],
             "restRanges": range_objects(policy["restRanges"]),
             "restScalars": policy["restScalars"],
         },
         "keywords": keyword_entries,
+        "deprecatedKeywords": deprecated,
         "booleanLiterals": booleans,
         "groups": groups,
         "declarationNames": declaration_names,
@@ -188,7 +197,18 @@ def flexible_spelling(word: str, ignored: Sequence[int]) -> str:
     if not ignored:
         return re.escape(word)
     gap = "(?:" + "|".join(onig_scalar(value) for value in ignored) + ")*"
-    return gap + gap.join(re.escape(char) for char in word) + gap
+    return gap + gap.join(normalized_char(char) for char in word) + gap
+
+
+# canonical scalar -> every scalar sharing its identity (Alef variants).
+NORMALIZED: dict[int, list[int]] = {}
+
+
+def normalized_char(char: str) -> str:
+    variants = NORMALIZED.get(ord(char))
+    if not variants:
+        return re.escape(char)
+    return "[" + "".join(onig_scalar(value) for value in [ord(char)] + variants) + "]"
 
 
 def alternation(words: Iterable[str], ignored: Sequence[int]) -> str:
@@ -222,6 +242,9 @@ def declaration_pattern(surface: dict, tokens: set[str], keyword_scope: str, nam
 def generate_grammar(surface: dict) -> dict:
     policy = surface["identifierPolicy"]
     ignored = policy["ignoredCodepoints"]
+    NORMALIZED.clear()
+    for entry in policy.get("normalizedCodepoints", []):
+        NORMALIZED.setdefault(entry["to"], []).append(entry["from"])
     start_ranges = [(x["start"], x["end"]) for x in policy["startRanges"]]
     rest_ranges = [(x["start"], x["end"]) for x in policy["restRanges"]]
     start_scalars = list(policy["startScalars"]) + list(ignored)

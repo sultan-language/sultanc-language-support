@@ -1,0 +1,70 @@
+============================================================
+Import forms
+============================================================
+
+import "geometry_en.sn";
+import std.text.number as numbers;
+from std.io import println, print;
+استورد المكتبة.نصوص.number;
+
+------------------------------------------------------------
+
+(source_file
+  (import_declaration
+    (string))
+  (import_declaration
+    (path
+      (identifier)
+      (identifier)
+      (identifier))
+    (identifier))
+  (from_import_declaration
+    (path
+      (identifier)
+      (identifier))
+    (identifier)
+    (identifier))
+  (import_declaration
+    (path
+      (identifier)
+      (identifier)
+      (identifier))))
+
+============================================================
+Module declarations
+============================================================
+
+module text { ar: نصوص };
+module float { ar: عائم, };
+وحدة ملفات = std.fs { en: files };
+module io = std.io;
+
+------------------------------------------------------------
+
+(source_file
+  (module_declaration
+    (identifier)
+    (module_spellings
+      (module_spelling
+        (identifier)
+        (identifier))))
+  (module_declaration
+    (identifier)
+    (module_spellings
+      (module_spelling
+        (identifier)
+        (identifier))))
+  (module_declaration
+    (identifier)
+    (module_path
+      (identifier)
+      (identifier))
+    (module_spellings
+      (module_spelling
+        (identifier)
+        (identifier))))
+  (module_declaration
+    (identifier)
+    (module_path
+      (identifier)
+      (identifier))))

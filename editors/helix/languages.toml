@@ -1,0 +1,28 @@
+# Add to ~/.config/helix/languages.toml (or a project's .helix/languages.toml).
+# The queries live in runtime/queries/sultanc/ next to this file; copy or
+# symlink that directory to ~/.config/helix/runtime/queries/sultanc.
+
+[[language]]
+name = "sultanc"
+scope = "source.sultanc"
+file-types = ["sn"]
+roots = ["Supax.toml"]
+comment-token = "//"
+indent = { tab-width = 4, unit = "    " }
+language-servers = ["sultanc-lsp"]
+auto-format = false
+
+[language.auto-pairs]
+'(' = ')'
+'{' = '}'
+'[' = ']'
+'"' = '"'
+'«' = '»'
+
+[language-server.sultanc-lsp]
+# The server must run from the SultanC home; the wrapper does `cd $SULTANC_HOME`.
+command = "sultanc-lsp-editor"
+
+[[grammar]]
+name = "sultanc"
+source = { git = "https://github.com/sultanc-lang/sultanc-language-support", rev = "REPLACE_WITH_COMMIT", subpath = "tree-sitter-sultanc" }
