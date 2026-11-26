@@ -5,7 +5,7 @@
 {
   dir = '/path/to/sultanc-language-support/editors/neovim',
   config = function()
-    require('sultanc').setup({ home = '/path/to/SultanC' })
+    require('sultanc').setup({ grammar = '/path/to/sultanc-language-support' })
   end,
 }
 ```
@@ -18,8 +18,10 @@
   `parser = '/path/to/sultanc.so'`.
 - Queries in `queries/sultanc/` (highlights, locals, folds, indents,
   textobjects) are generated from `tree-sitter-sultanc/queries/`.
-- LSP: `vim.lsp.config('sultanc', ...)` with `cmd_cwd = home`, so the
-  compiler finds `library/` (std).
+- LSP: `vim.lsp.config('sultanc', ...)` starting `sultanc-analyzer` from `PATH`
+  (the toolchain's `~/.supax/bin`), else `~/.supax/bin/sultanc-analyzer`, else
+  `$SULTANC_HOME/build/sultanc-analyzer`, or `server = '/path/to/sultanc-analyzer'`.
+  It finds its standard library next to itself.
 
 `tests/editors/neovim_test.lua` checks all of this headless, including a
 diagnostic from sultanc-analyzer.

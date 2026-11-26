@@ -49,19 +49,23 @@ function isHome(dir, isFile) {
     return Boolean(dir) && isFile(path.join(dir, 'library', 'std', 'io', 'println.sn'));
 }
 
+// The Supax home, where Supax's installer puts the toolchain: bin/sultanc,
+// bin/sultanc-analyzer, lib/sultanc/library (as rustup's ~/.cargo/bin).
+function supaxHome(env) {
+    return env.SUPAX_HOME || path.join(env.HOME || env.USERPROFILE || require('os').homedir(), '.supax');
+}
+
 /**
  * Server resolution order:
  *   1. `sultanc.server.path` (absolute, or relative to the first workspace folder)
  *   2. <workspace>/build/sultanc-analyzer, then <workspace>/<subfolder>/build/sultanc-analyzer
  *      (a SultanC checkout being worked on)
  *   3. $SULTANC_HOME/build/sultanc-analyzer
- *   4. the server bundled in a platform-specific extension package:
- *      <extension>/sultanc/build/sultanc-analyzer, with its standard library in
- *      <extension>/sultanc/library (the layout of a checkout)
+ *   4. the installed toolchain: $SUPAX_HOME/bin/sultanc-analyzer (~/.supax)
  *   5. sultanc-analyzer on PATH
- * In each place but the bundle, the former name sultanc-lsp is tried after it.
+ * In each place the former name sultanc-lsp is tried after it.
  */
-function findServer({ configuredPath = '', workspaceFolders = [], env = process.env, bundledDir = null, isFile = defaultIsFile, listDirs = defaultListDirs } = {}) {
+function findServer({ configuredPath = '', workspaceFolders = [], env = process.env, isFile = defaultIsFile, listDirs = defaultListDirs } = {}) {
     const candidates = [];
     const configured = (configuredPath || '').trim();
     if (configured) {
@@ -73,47 +77,48 @@ function findServer({ configuredPath = '', workspaceFolders = [], env = process.
         for (const name of NAMES) candidates.push(path.join(root, 'build', name));
     }
     if (env.SULTANC_HOME) for (const name of NAMES) candidates.push(path.join(env.SULTANC_HOME, 'build', name));
-    if (bundledDir) candidates.push(path.join(bundledDir, 'build', EXECUTABLE));
+    for (const name of NAMES) candidates.push(path.join(supaxHome(env), 'bin', name));
     for (const dir of (env.PATH || '').split(path.delimiter)) {
         if (dir) for (const name of NAMES) candidates.push(path.join(dir, name));
     }
     for (const candidate of candidates) {
-        if (isFile(candidate)) {
-            const bundled = Boolean(bundledDir) && candidate === path.join(bundledDir, 'build', EXECUTABLE);
-            return { path: candidate, candidates, bundled };
-        }
+        if (isFile(candidate)) return { path: candidate, candidates };
     }
-    return { path: null, candidates, bundled: false };
+    return { path: null, candidates };
+}
+
+// The standard library next to a server executable, as the compiler finds its
+// own (compiler/driver/std_location.sn): <bin>/library, <bin>/../library (a
+// checkout's build/), <bin>/../lib/sultanc/library (an install prefix such as
+// ~/.supax). The directory holding that library/.
+function homeNextTo(serverPath, isFile) {
+    const bin = path.dirname(serverPath);
+    const parent = path.dirname(bin);
+    for (const dir of [bin, parent, path.join(parent, 'lib', 'sultanc')]) {
+        if (isHome(dir, isFile)) return dir;
+    }
+    return null;
 }
 
 /**
  * SultanC home resolution order (the server resolves `std` under it):
  *   1. `sultanc.home`
- *   2. the bundle's own directory for the bundled server: it was built against
- *      that standard library, so $SULTANC_HOME does not replace it
+ *   2. the library next to the server, which it was built against
  *   3. $SULTANC_HOME
- *   4. an ancestor of the server executable holding library/std
- *      (a compiler checkout's build/sultanc-analyzer, or an install prefix)
- *   5. a workspace folder holding library/std
+ *   4. a workspace folder holding library/std
  */
-function findHome({ configuredHome = '', serverPath = null, bundledDir = null, workspaceFolders = [], env = process.env, isFile = defaultIsFile, listDirs = defaultListDirs } = {}) {
+function findHome({ configuredHome = '', serverPath = null, workspaceFolders = [], env = process.env, isFile = defaultIsFile, listDirs = defaultListDirs } = {}) {
     const configured = (configuredHome || '').trim();
     if (configured) return configured;
-    if (bundledDir && serverPath === path.join(bundledDir, 'build', EXECUTABLE) && isHome(bundledDir, isFile)) return bundledDir;
-    if (env.SULTANC_HOME) return env.SULTANC_HOME;
     if (serverPath) {
-        let dir = path.dirname(serverPath);
-        for (let depth = 0; depth < 4; depth++) {
-            if (isHome(dir, isFile)) return dir;
-            const parent = path.dirname(dir);
-            if (parent === dir) break;
-            dir = parent;
-        }
+        const next = homeNextTo(serverPath, isFile);
+        if (next) return next;
     }
+    if (env.SULTANC_HOME) return env.SULTANC_HOME;
     for (const root of searchRoots(workspaceFolders, listDirs)) {
         if (isHome(root, isFile)) return root;
     }
     return null;
 }
 
-module.exports = { EXECUTABLE, LEGACY_EXECUTABLE, findServer, findHome };
+module.exports = { EXECUTABLE, LEGACY_EXECUTABLE, supaxHome, findServer, findHome };

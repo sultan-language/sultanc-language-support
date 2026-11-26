@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-sultanc",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "SultanC grammar for tree-sitter (Arabic and English surfaces)",
   "license": "MIT",
   "main": "bindings/node",

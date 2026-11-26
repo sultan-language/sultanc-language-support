@@ -1,38 +1,21 @@
 //! Zed extension for SultanC: the tree-sitter grammar comes from
 //! ../../tree-sitter-sultanc (see extension.toml); this crate only tells Zed
-//! how to start sultanc-lsp.
+//! how to start sultanc-analyzer.
 //!
-//! The server must run from the SultanC home (the compiler finds the standard
-//! library as `library/Supax.toml` relative to its working directory), and
-//! Zed's `Command` has no working-directory field. Resolution order:
+//! The server finds its standard library next to itself, as the compiler
+//! does (`<bin>/../lib/sultanc/library` in the toolchain, `<bin>/../library`
+//! in a checkout's build/), so it starts from any directory. Resolution order:
 //!
-//! 1. `lsp.sultanc-lsp.binary` in Zed settings (path, arguments, env);
-//! 2. `sultanc-lsp-editor` on PATH (sultanc-lsp/tools/sultanc-lsp-editor.sh);
-//! 3. `SULTANC_HOME` in the worktree's shell environment, started through
-//!    `/bin/sh` so the server runs from that directory (macOS and Linux).
+//! 1. `lsp.sultanc-analyzer.binary` in Zed settings (path, arguments, env);
+//! 2. `sultanc-analyzer` on PATH (the toolchain's ~/.supax/bin);
+//! 3. `$SUPAX_HOME/bin/sultanc-analyzer`, else `~/.supax/bin/sultanc-analyzer`;
+//! 4. `$SULTANC_HOME/build/sultanc-analyzer` (a checkout).
 
-use std::collections::HashMap;
 use zed_extension_api::{self as zed, settings::LspSettings, LanguageServerId, Result};
 
-const SERVER: &str = "sultanc-lsp";
-const WRAPPER: &str = "sultanc-lsp-editor";
+const SERVER: &str = "sultanc-analyzer";
 
 struct SultanC;
-
-fn shell_start(home: &str, server: Option<&str>) -> (String, Vec<String>) {
-    // The paths travel as positional parameters, never spliced into the script.
-    let script = r#"cd "$1" && exec "${2:-$1/build/sultanc-lsp}""#;
-    (
-        "/bin/sh".to_string(),
-        vec![
-            "-c".to_string(),
-            script.to_string(),
-            "sultanc-lsp".to_string(),
-            home.to_string(),
-            server.unwrap_or("").to_string(),
-        ],
-    )
-}
 
 impl zed::Extension for SultanC {
     fn new() -> Self {
@@ -44,35 +27,37 @@ impl zed::Extension for SultanC {
         _id: &LanguageServerId,
         worktree: &zed::Worktree,
     ) -> Result<zed::Command> {
-        let shell: HashMap<String, String> = worktree.shell_env().into_iter().collect();
+        let mut env: Vec<(String, String)> = worktree.shell_env();
         let settings = LspSettings::for_worktree(SERVER, worktree).unwrap_or_default();
         let binary = settings.binary;
-        let mut env: Vec<(String, String)> = shell.clone().into_iter().collect();
         if let Some(extra) = binary.as_ref().and_then(|b| b.env.clone()) {
             env.extend(extra);
         }
         let lookup = |key: &str| env.iter().rev().find(|(k, _)| k == key).map(|(_, v)| v.clone());
+        let args = binary.as_ref().and_then(|b| b.arguments.clone()).unwrap_or_default();
 
         if let Some(path) = binary.as_ref().and_then(|b| b.path.clone()) {
-            let args = binary.as_ref().and_then(|b| b.arguments.clone()).unwrap_or_default();
-            if let Some(home) = lookup("SULTANC_HOME") {
-                let (command, mut sh_args) = shell_start(&home, Some(&path));
-                sh_args.extend(args);
-                return Ok(zed::Command { command, args: sh_args, env });
-            }
             return Ok(zed::Command { command: path, args, env });
         }
-        if let Some(wrapper) = worktree.which(WRAPPER) {
-            return Ok(zed::Command { command: wrapper, args: vec![], env });
+        if let Some(path) = worktree.which(SERVER) {
+            return Ok(zed::Command { command: path, args, env });
+        }
+        let toolchain = lookup("SUPAX_HOME").or_else(|| lookup("HOME").map(|home| format!("{home}/.supax")));
+        let mut candidates: Vec<String> = Vec::new();
+        if let Some(prefix) = toolchain {
+            candidates.push(format!("{prefix}/bin/{SERVER}"));
         }
         if let Some(home) = lookup("SULTANC_HOME") {
-            let server = lookup("SULTANC_LSP");
-            let (command, args) = shell_start(&home, server.as_deref());
-            return Ok(zed::Command { command, args, env });
+            candidates.push(format!("{home}/build/{SERVER}"));
+        }
+        // Zed's extension API cannot test a path outside the worktree, so the
+        // first candidate is started; Zed reports it if it does not exist.
+        if let Some(path) = candidates.into_iter().next() {
+            return Ok(zed::Command { command: path, args, env });
         }
         Err(format!(
-            "SultanC: set SULTANC_HOME to your SultanC checkout, put {WRAPPER} on PATH, \
-             or set lsp.{SERVER}.binary.path in Zed settings"
+            "SultanC: install {SERVER} into the SultanC toolchain (sultanc-analyzer/tools/install.sh), \
+             put it on PATH, or set lsp.{SERVER}.binary.path in Zed settings"
         ))
     }
 

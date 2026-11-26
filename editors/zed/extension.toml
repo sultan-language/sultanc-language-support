@@ -1,9 +1,9 @@
 id = "sultanc"
 name = "SultanC"
-description = "SultanC language support: tree-sitter syntax (Arabic and English) and sultanc-lsp."
-version = "0.1.0"
+description = "SultanC language support: tree-sitter syntax (Arabic and English) and sultanc-analyzer."
+version = "0.1.2"
 schema_version = 1
-authors = ["SultanC contributors"]
+authors = ["Madyan Al-hajebi"]
 repository = "https://github.com/sultanc-lang/sultanc-language-support"
 
 [grammars.sultanc]
@@ -14,6 +14,6 @@ repository = "https://github.com/sultanc-lang/sultanc-language-support"
 rev = "REPLACE_WITH_COMMIT"
 path = "tree-sitter-sultanc"
 
-[language_servers.sultanc-lsp]
+[language_servers.sultanc-analyzer]
 name = "SultanC LSP"
 languages = ["SultanC"]

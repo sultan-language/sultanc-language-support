@@ -30,23 +30,26 @@ Hover, completion and signature help keep answering while the file has syntax er
 
 ## Setup
 
-Install the extension; VS Code picks the package for your platform. The packages for **Linux, macOS and Windows on x64 and arm64** bundle the language server and the standard library it was built with, so hover, completion, navigation and diagnostics work with nothing else installed.
+The extension uses the SultanC toolchain installed on your machine, as other language extensions use theirs: the compiler and the language server are installed together, so the server always analyses with the same compiler and standard library you build with.
 
-Running, checking, testing and debugging programs need the SultanC compiler. The extension uses, in this order: `sultanc.compiler.path`, `<home>/build/sultanc`, `$SULTANC`, `~/.supax/bin/sultanc` (Supax's installer), then `sultanc` on `PATH`.
+1. Install the compiler with Supax's installer (`~/.supax/bin/sultanc`).
+2. Install the language server next to it: `sultanc-analyzer/tools/install.sh` ([how](https://github.com/sultan-language/sultanc-analyzer#install)), which writes `~/.supax/bin/sultanc-analyzer`.
 
-### Using another server
+The extension then finds both on its own. When the server is missing it says so, with a link to these steps; editing still gets syntax highlighting and the RTL editor.
 
-The extension finds the server in this order:
+### Where the extension looks
+
+The language server, in this order:
 
 1. `sultanc.server.path`;
 2. `build/sultanc-analyzer` in a workspace folder or one of its subfolders (a SultanC checkout you are working on);
 3. `$SULTANC_HOME/build/sultanc-analyzer`;
-4. the bundled server;
+4. the toolchain: `$SUPAX_HOME/bin/sultanc-analyzer` (default `~/.supax/bin`);
 5. `sultanc-analyzer` on `PATH`.
 
-To build one against a checkout: `sultanc-analyzer/tools/build.sh /path/to/sultanc` (writes `/path/to/sultanc/build/sultanc-analyzer`).
+The compiler (Run, Check, Build, tests, debugging, check on save): `sultanc.compiler.path`, `<home>/build/sultanc`, `$SULTANC`, `~/.supax/bin/sultanc`, then `sultanc` on `PATH`.
 
-The server runs from the SultanC home, the directory that holds `library/`, where the compiler resolves `std`. The home is, in this order: `sultanc.home`; the bundle, for the bundled server; `$SULTANC_HOME`; the checkout that contains the server; a workspace folder.
+The server analyses with the standard library next to it (`~/.supax/lib/sultanc/library` for the toolchain, `library/` for a checkout), as the compiler does. `sultanc.home` overrides it.
 
 The status bar item shows the server state, version, server path and SultanC home. Click it for the command menu.
 
@@ -54,7 +57,7 @@ The status bar item shows the server state, version, server path and SultanC hom
 
 | Setting | Default | |
 |---|---|---|
-| `sultanc.server.path` | `""` | Path to `sultanc-analyzer`; empty uses the bundled server (see Setup) |
+| `sultanc.server.path` | `""` | Path to `sultanc-analyzer`; empty uses the installed toolchain (see Setup) |
 | `sultanc.home` | `""` | SultanC home (the server's working directory) |
 | `sultanc.compiler.path` | `""` | The `sultanc` compiler for Run, Check, Build, tests and the check on save |
 | `sultanc.lens.run` | `true` | "▶︎ Run · Debug" above the program entry and "▶︎ Run Test · Debug" above each test |

@@ -26,7 +26,7 @@ function isArabicDocument(document) {
 /**
  * The compiler for Run / Check / Build / tests and the check on save:
  *   1. `sultanc.compiler.path`
- *   2. <home>/build/sultanc (a checkout, or the bundled toolchain)
+ *   2. <home>/build/sultanc (a checkout)
  *   3. $SULTANC
  *   4. ~/.supax/bin/sultanc (Supax's tools/install.sh)
  *   5. sultanc on PATH

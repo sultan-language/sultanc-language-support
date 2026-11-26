@@ -1,8 +1,9 @@
--- SultanC for Neovim: tree-sitter parser registration and sultanc-lsp.
+-- SultanC for Neovim: tree-sitter parser registration and sultanc-analyzer.
 --
 --   require('sultanc').setup({
---     home = '/path/to/SultanC',          -- or $SULTANC_HOME
 --     grammar = '/path/to/sultanc-language-support',  -- this repository
+--     -- server = '/path/to/sultanc-analyzer',  -- default: sultanc-analyzer on PATH
+--     --                                         -- (the toolchain's ~/.supax/bin)
 --   })
 local M = {}
 
@@ -39,7 +40,22 @@ end
 
 function M.setup(opts)
   opts = opts or {}
-  local home = opts.home or vim.env.SULTANC_HOME
+  -- The server finds its standard library next to itself: the toolchain's
+  -- ~/.supax/bin/sultanc-analyzer, or a checkout's build/sultanc-analyzer.
+  local server = opts.server
+  if not server then
+    if vim.fn.executable('sultanc-analyzer') == 1 then
+      server = 'sultanc-analyzer'
+    else
+      local prefix = vim.env.SUPAX_HOME or (vim.env.HOME .. '/.supax')
+      local home = opts.home or vim.env.SULTANC_HOME
+      if vim.fn.executable(prefix .. '/bin/sultanc-analyzer') == 1 then
+        server = prefix .. '/bin/sultanc-analyzer'
+      elseif home then
+        server = home .. '/build/sultanc-analyzer'
+      end
+    end
+  end
   local grammar = opts.grammar or repo_root()
 
   vim.filetype.add({ extension = { sn = 'sultanc' } })
@@ -49,10 +65,9 @@ function M.setup(opts)
     vim.treesitter.language.add('sultanc', { path = opts.parser })
   end
 
-  if home and vim.lsp.config then
+  if server and vim.lsp.config then
     vim.lsp.config('sultanc', {
-      cmd = { opts.server or (home .. '/build/sultanc-lsp') },
-      cmd_cwd = home, -- the compiler finds library/Supax.toml from here
+      cmd = { server },
       filetypes = { 'sultanc' },
       root_markers = { 'Supax.toml', '.git' },
     })

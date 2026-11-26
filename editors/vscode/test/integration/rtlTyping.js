@@ -53,7 +53,7 @@ const arabic = `نوع نقطة = { س: عدد, ص: عدد };
 // [file, line marker after which the empty line is, typed text, expected first items, accepted line or null]
 const cases = [
     ['scope_test.sn', '= 3;\n', 'let z: int = de', ['deepest'], 'let z: int = deepest'],
-    ['scope_test.sn', '= 3;\n', 'let z: int = outer_value.', ['inner', 'count'], null],
+    ['scope_test.sn', '= 3;\n', 'let z: int = outer_value.', ['count', 'inner'], null],
     ['scope_test.sn', '= 3;\n', 'let z: int = outer_value.inner.', ['depth', 'label'], null],
     ['scope_test.sn', '= 3;\n', 'let c: Color = Color.', ['Red', 'Green'], null],
     ['scope_test.sn', '= 3;\n', 'let a: int = are', ['area'], null],

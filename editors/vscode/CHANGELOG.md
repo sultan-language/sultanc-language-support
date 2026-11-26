@@ -1,9 +1,11 @@
 # Changelog
 
-## 0.15.0
+## 0.1.2
+
+The extension takes the SultanC toolchain version (it was versioned on its own, up to 0.15.0).
 
 ### Added
-- **Bundled language server**: platform-specific packages for Linux, macOS and Windows on x64 and arm64 include `sultanc-lsp` and its standard library (`sultanc/` in the package). The extension uses it when no other server is configured or found; `sultanc.server.path` still selects any server.
+- **Uses the installed SultanC toolchain**: the language server is found in `~/.supax/bin/sultanc-analyzer` (`$SUPAX_HOME`), next to the compiler it was built with, and analyses with the standard library beside it. When it is missing, a message says so and links to the install steps. One package for every platform; no binaries inside.
 - "▶︎ Run · Debug" above the program entry now comes from the server (the compiler's entry symbol), in the file's language.
 - The compiler is also found in `$SULTANC`, `~/.supax/bin/sultanc` and on `PATH`.
 
@@ -14,6 +16,8 @@
 - The first letters typed right after the first edit of a file were lost: a dirty-state event sent the old text back.
 - Arabic hover text reads right to left (`bidiIsolates`): signatures such as `عرف الأكبر(الأول: عدد, الثاني: عدد): عدد` and the Arabic labels are no longer reordered by the surrounding left-to-right hover.
 
+- The Arabic comma `،` (patterns checkpoint): highlighted as a delimiter, accepted by the tree-sitter grammar (Helix, Neovim, Zed), and it opens signature help in the RTL editor.
+
 ### Changed
 - ⚠️ The Arabic `let` keyword is **`ليكن`** (was `دع`): syntax surface and grammars regenerated from the compiler's token registry with the new spelling, tree-sitter parser regenerated, snippets, samples and tests updated.
 - The language server is now **sultanc-analyzer** (formerly sultanc-lsp). The extension looks for `build/sultanc-analyzer` first and still finds a `build/sultanc-lsp` made before the rename. The e2e test variables are `SULTANC_ANALYZER` and `SULTANC_HOME`.
@@ -22,19 +26,21 @@
 - The extension's own references CodeLens, header-comment Test Explorer, regex rename-imports and regex entry lens. The server provides each of them once (`textDocument/codeLens`, `sultanc/tests`, `workspace/willRenameFiles`), so there is one Test Explorer and one references lens.
 - Settings `sultanc.codeLens.run`, `sultanc.codeLens.references` and `sultanc.updateImportsOnRename`; use `sultanc.lens.run` and `sultanc.lens.references`.
 
-## 0.14.0
+## Before 0.1.2: own version numbers
+
+### 0.14.0
 
 ### Added
 - **Debug one test**: a "Debug" lens beside "▶︎ Run Test", and a Debug profile in the Test Explorer. The test is built with `sultanc test --test=NAME -O0 -o PATH --no-run` and debugged with gdb or lldb as `PATH INDEX`, so breakpoints inside the test stop and its variables show (sultanc-lsp 0.20).
 - Completion inserts constructors as calls where a value is written: `Color.` → `Red()`, `Shape.` → `Circle(`; a match arm keeps `Color.Red`.
 - Quick fix for `Color.Red` without `()`: adds the `()` (the compiler's `SULTANC-NAME-CONSTRUCTOR-NOT-CALLED`).
 
-## 0.13.2
+### 0.13.2
 
 ### Fixed
 - RTL editor: **Backspace and Delete work everywhere** as in any editor. At the start of a line or on an empty line, Backspace did nothing: the text area keeps an invisible direction mark at each line start, and the key erased that mark (put back right away) instead of the line break. Both keys now edit the source text: a line start joins the line above, Delete at a line end joins the next line, Backspace in leading spaces goes back one indentation stop, Option+Delete (Ctrl+Backspace) erases a word, Cmd+Delete erases to the line start, Fn+Delete deletes forward.
 
-## 0.13.1
+### 0.13.1
 
 ### Fixed
 - RTL editor: a closed suggestion list left a thin line under the code (its border was still drawn).
@@ -43,14 +49,14 @@
 ### Added
 - RTL editor: **Delete Line** (Cmd/Ctrl+Shift+K), **Move Line** (Alt+Up/Down), **Copy Line** (Shift+Alt+Up/Down), and Cut with nothing selected cuts the line, as in VS Code's editor.
 
-## 0.13.0
+### 0.13.0
 
 ### Changed
 - RTL editor completion list redesigned: an icon for each kind (function, variable, field, type, enum, enum member, module, keyword…) in VS Code's own symbol colours; the typed letters marked in each name; the type on the side, or the module an auto-import adds; a details pane with the selected item's signature, docs and the `import` it adds. Translucent surface, smooth opening, VS Code's suggest-widget theme colours only (light, dark, high contrast). Right to left in Arabic files.
 - The list opens under the line being typed, or above it when there is no room, never over it.
 - Auto-import names now keep coming as you type (`int_to` → `int_to_text`): the server marks a list that more letters can change as incomplete (sultanc-lsp 0.18.1), and the editor asks again.
 
-## 0.12.1
+### 0.12.1
 
 ### Fixed
 - RTL editor: completion opens **by itself while typing**, as VS Code's text editor does: after `.` and at the start of a word (Arabic and English), filtered as you keep typing. Before, it opened only with Ctrl+Space (which macOS takes for switching keyboard languages) and closed at every key.
@@ -59,7 +65,7 @@
 - RTL editor: the caret stays in the editor when you switch to another app and back.
 - `npm run test:rtl`: types into the RTL editor in a real VS Code (Playwright) and checks the list, in English and Arabic.
 
-## 0.12.0
+### 0.12.0
 
 ### Added
 - **Check on save** (sultanc-lsp 0.18), as rust-analyzer's `cargo check`: after each save, and at start, the server runs `sultanc check` on the project and shows its errors in files that are not open, in each file's language. Opening a file switches it to live diagnostics (one copy, never two); closing it brings the check's back. Settings: `sultanc.checkOnSave`, `sultanc.check.entries`.
@@ -67,19 +73,19 @@
 - **Format on type** (`editor.formatOnType`): `;` and `}` format with the compiler's formatter.
 - **Closing brace hints**: `} // def main` after declarations of 25 lines or more (`sultanc.inlayHints.closingBraceHints.*`).
 
-## 0.11.1
+### 0.11.1
 
 ### Added
 - The `module` / `وحدة` keyword (token `MODULE`, interp2) is highlighted, shows both spellings on hover (sultanc-lsp 0.17.1), and is parsed by tree-sitter (Neovim, Helix, Zed): `module text { ar: نصوص };` and the re-export `module io = std.io;`. Regenerated from the compiler's token registry with `tools/sync-from-compiler.sh`.
 
-## 0.11.0
+### 0.11.0
 
 ### Changed
 - Works with the layered standard library (`library/core`, `library/alloc`, `library/std`; sultanc-lsp 0.17). Auto-import completion finds names in every layer (`int_to_text` → `import std.text.number;`), and workspace symbols leave out all of them.
 - "Add missing match arms" and "add missing import" are the compiler's own fixes (`add-missing-arms`, `import-module`), shown on the diagnostic. The server's text-based versions are removed.
 - The "language server not found" message names the build command for the opened checkout: `sultanc-lsp/tools/build.sh <checkout>`.
 
-## 0.10.0
+### 0.10.0
 
 ### Changed
 - Faster after an edit (sultanc-lsp 0.16): in `compiler/`, references after editing `compiler/main.sn` take 0.45 s instead of 1.75 s, and diagnostics 0.38 s instead of 1.2 s. The server no longer copies the analysed program between its cache and requests, and prepares the compiler's next analysis while you are not typing.
@@ -87,7 +93,7 @@
 - Tests in a Supax package run with the package graph (sultanc-lsp 0.15, `sultanc/packageGraph`, given to `sultanc test --package-graph=-`), so their imports of other packages resolve.
 - An invalid test (`@@test` with parameters, a wrong result type, not a function) is underlined while you type, with the compiler's `SULTANC-TEST-*` diagnostic.
 
-## 0.9.0
+### 0.9.0
 
 ### Added
 - Test Explorer: the `@@test` / `@@اختبار` functions of each open file, found by the compiler (sultanc-lsp 0.14, `sultanc/tests`), with run buttons in the gutter. A run is `sultanc test <file>` (`--filter <name>` for one test); each test shows passed or failed, and a failure shows why (returned error, assertion, exit status, signal) and where.
@@ -97,7 +103,7 @@
 - Debug builds use `-O0`, as Cargo's debug profile does: a breakpoint inside a small function (`ضاعف`) stops on its line, and its locals show their values (`ن = 42`) instead of `<optimized out>`. Run and Test keep the default level. The e2e test checks both under gdb and lldb.
 - The server keeps the compiler's incremental analysis between requests: after an edit only the edited file and the files that import it are analysed again.
 
-## 0.8.0
+### 0.8.0
 
 ### Added
 - Completion while you type (sultanc-lsp 0.13), answered by the compiler on the unfinished line: `p.` lists the fields of `p`, `import std.` / `استورد المكتبة.دخ.` the modules there, `std.io.` the module's names, and inside a function the locals and parameters first, then the module's functions, imports and std.
@@ -112,7 +118,7 @@
 - Cancelling a request, or editing its file, now stops an analysis that is already running.
 - The SultanC home is found by its standard library (`library/std`), not by a manifest file.
 
-## 0.7.0
+### 0.7.0
 
 ### Added
 - Debugging: a `sultanc` launch configuration (F5, or the 🐞 Debug lens on the entry) builds the `.sn` file with `sultanc` and debugs it on gdb 14+ (`gdb -i=dap`) or `lldb-dap`. Breakpoints in `.sn` files, stepping, stack frames. With gdb 14/15 the extension holds `launch` until the breakpoints are set, so they hit on the first run.
@@ -124,7 +130,7 @@
 - Requests the editor cancels, or that a later edit makes stale, are dropped by the server instead of answered late.
 - Find references and rename cover the whole project with no 300-file cap.
 
-## 0.6.0
+### 0.6.0
 
 ### Added
 - Code actions from sultanc-lsp 0.7:
@@ -141,17 +147,17 @@
   - compiler test headers.
 - Marketplace metadata (homepage, issues, gallery banner) and `PUBLISHING.md`.
 
-## 0.5.2
+### 0.5.2
 
 ### Fixed
 - RTL editor: two lines no longer show above the code. The Peek panel's style overrode its `hidden` state.
 
-## 0.5.1
+### 0.5.1
 
 ### Changed
 - Follows the compiler's new spelling `إذا` (was `لو`) in highlighting, keywords, snippets and samples.
 
-## 0.5.0
+### 0.5.0
 
 ### Added
 - RTL editor:
@@ -168,7 +174,7 @@
 - Enter keeps the current line's indentation only, goes one level in after `{`, and leaves empty lines empty. Typing `}` on a blank line returns it to its block's level.
 - Diagnostics follow open files only, with one copy per problem.
 
-## 0.4.0
+### 0.4.0
 
 The extension is rebuilt on `vscode-languageclient`, the client used by rust-analyzer, clangd and gopls.
 
@@ -200,5 +206,5 @@ The extension is rebuilt on `vscode-languageclient`, the client used by rust-ana
 - Diagnostics in Arabic or English; errors in other modules are reported at the top of the file.
 - Hover, completion and signature help keep working while the file has syntax errors.
 
-## 0.3.12
+### 0.3.12
 - Last release of the webview-first editor with a custom JSON-RPC client.

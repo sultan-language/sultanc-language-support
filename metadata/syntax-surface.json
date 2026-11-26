@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "generatedFrom": {
     "tokenRegistry": "token_registry.def",
-    "tokenRegistrySha256": "49b92b47728acf8fb3c348689c73369752066aef808f79bf417f0ee6a6516242",
+    "tokenRegistrySha256": "625831062afaea542fd317b298da49b159fa364b2783b8baecf141b9ff36d844",
     "identifierPolicy": "identifier_policy_registry.def",
     "identifierPolicySha256": "eec4c3d68735a00b1cc50bb2793ef4bdad45c41c29fbad894e525e00a01b4db8"
   },
@@ -635,6 +635,7 @@
     ":=",
     "->",
     "؟",
+    "،",
     "@",
     "+",
     "-",
@@ -709,6 +710,10 @@
     {
       "token": "QUESTION_OPERATOR",
       "spelling": "؟"
+    },
+    {
+      "token": "COMMA_OPERATOR",
+      "spelling": "،"
     },
     {
       "token": "AT_OPERATOR",

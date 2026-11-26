@@ -13,21 +13,23 @@ actions).
 
 ## Language server
 
-The server must start from the SultanC home. Any one of these works:
+Install `sultanc-analyzer` into the SultanC toolchain
+(`sultanc-analyzer/tools/install.sh`, see its README). The extension starts the
+first of:
 
-- `SULTANC_HOME` in the environment Zed sees (the extension runs
-  `cd $SULTANC_HOME && build/sultanc-analyzer` through `/bin/sh`);
-- `sultanc-analyzer-editor` on `PATH` (`sultanc-analyzer/tools/sultanc-analyzer-editor.sh`);
-- Zed settings:
+- `lsp.sultanc-analyzer.binary.path` in Zed settings;
+- `sultanc-analyzer` on `PATH` (`~/.supax/bin` after Supax's installer);
+- `$SUPAX_HOME/bin/sultanc-analyzer`, else `~/.supax/bin/sultanc-analyzer`;
+- `$SULTANC_HOME/build/sultanc-analyzer` (a checkout).
+
+The server finds its standard library next to itself, so no working directory
+is needed. Zed settings, for a build elsewhere:
 
 ```json
 {
   "lsp": {
     "sultanc-analyzer": {
-      "binary": {
-        "path": "/path/to/SultanC/build/sultanc-analyzer",
-        "env": { "SULTANC_HOME": "/path/to/SultanC" }
-      }
+      "binary": { "path": "/path/to/sultanc/build/sultanc-analyzer" }
     }
   }
 }

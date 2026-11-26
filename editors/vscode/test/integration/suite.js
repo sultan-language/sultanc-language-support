@@ -404,12 +404,6 @@ async function run() {
         await vscode.window.showTextDocument(en);
     });
 
-    if (process.env.SULTANC_E2E_BUNDLED) await check('the bundled server and its library are used', async () => {
-        const server = ext.exports.server();
-        assert.ok(server.bundled, server.path);
-        assert.strictEqual(ext.exports.home(), path.join(ext.extensionPath, 'sultanc'));
-    });
-
     await check('commands are registered', async () => {
         const all = await vscode.commands.getCommands(true);
         for (const id of ['sultanc.restartServer', 'sultanc.showOutput', 'sultanc.showServerInfo', 'sultanc.openRtlEditor']) {

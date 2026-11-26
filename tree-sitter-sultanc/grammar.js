@@ -133,8 +133,11 @@ const BINARY = [
 ];
 
 const prefix = ($) => [repeat($.attribute), optional($.visibility)];
+// The comma: `,` or the Arabic comma `،` (U+060C), the same token
+// (COMMA_OPERATOR) in the compiler's registry.
+const comma = () => choice(',', '،');
 const commaSep = (rule) => optional(commaSep1(rule));
-const commaSep1 = (rule) => seq(rule, repeat(seq(',', rule)), optional(','));
+const commaSep1 = (rule) => seq(rule, repeat(seq(comma(), rule)), optional(comma()));
 
 module.exports = grammar({
   name: 'sultanc',
@@ -283,7 +286,7 @@ module.exports = grammar({
       ';',
     ),
 
-    record_type: ($) => seq('{', repeat(seq($.field_declaration, optional(','))), '}'),
+    record_type: ($) => seq('{', repeat(seq($.field_declaration, optional(comma()))), '}'),
 
     field_declaration: ($) => seq(field('name', $.identifier), ':', field('type', $._type)),
 
@@ -371,7 +374,7 @@ module.exports = grammar({
     // Contextual type constructors (compiler/frontend/type_name_surface_generated.sn).
     vector_type: ($) => prec.right(seq(alias(ctx('vector', 'متجه'), $.type_constructor), $._type)),
     option_type: ($) => prec.right(seq(alias(ctx('option', 'اختياري', 'اختيار'), $.type_constructor), $._type)),
-    result_type: ($) => prec.right(seq(alias(ctx('result', 'نتيجة'), $.type_constructor), $._type, ',', $._type)),
+    result_type: ($) => prec.right(seq(alias(ctx('result', 'نتيجة'), $.type_constructor), $._type, comma(), $._type)),
 
     // ── Statements ────────────────────────────────────────────────────────
     // The trailing expression without `;` only occurs in `comptime { ... }`
@@ -543,7 +546,7 @@ module.exports = grammar({
     parenthesized_expression: ($) => seq('(', $._expression, ')'),
 
     // Initializer forms (parser/initialization.sn): `()`, `(a, b)`, `box v`.
-    tuple_expression: ($) => choice(seq('(', ')'), seq('(', $._expression, ',', commaSep($._expression), ')')),
+    tuple_expression: ($) => choice(seq('(', ')'), seq('(', $._expression, comma(), commaSep($._expression), ')')),
 
     box_expression: ($) => prec(PREC.unary, seq(kw('BOX_OPERATOR'), $._expression)),
 

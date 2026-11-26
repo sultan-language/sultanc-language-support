@@ -3,8 +3,8 @@
 1. Append `languages.toml` to `~/.config/helix/languages.toml` and set `rev`.
 2. Link the queries: `ln -s "$PWD/runtime/queries/sultanc" ~/.config/helix/runtime/queries/sultanc`.
 3. `hx --grammar fetch && hx --grammar build`.
-4. Put `sultanc-analyzer-editor` (`sultanc-analyzer/tools/sultanc-analyzer-editor.sh`) on
-   `PATH` and export `SULTANC_HOME`.
+4. Install `sultanc-analyzer` into the SultanC toolchain
+   (`sultanc-analyzer/tools/install.sh`); `~/.supax/bin` is on `PATH` after Supax's installer.
 5. `hx --health sultanc` should show the server, parser and all three query sets.
 
 The queries are generated: Helix capture names, with pattern order reversed

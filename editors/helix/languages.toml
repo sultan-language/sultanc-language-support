@@ -9,7 +9,7 @@ file-types = ["sn"]
 roots = ["Supax.toml"]
 comment-token = "//"
 indent = { tab-width = 4, unit = "    " }
-language-servers = ["sultanc-lsp"]
+language-servers = ["sultanc-analyzer"]
 auto-format = false
 
 [language.auto-pairs]
@@ -19,10 +19,11 @@ auto-format = false
 '"' = '"'
 '«' = '»'
 
-[language-server.sultanc-lsp]
-# The server must run from the SultanC home; the wrapper does `cd $SULTANC_HOME`.
-command = "sultanc-lsp-editor"
+[language-server.sultanc-analyzer]
+# Installed in the SultanC toolchain (~/.supax/bin, on PATH); it finds its
+# standard library next to itself.
+command = "sultanc-analyzer"
 
 [[grammar]]
 name = "sultanc"
-source = { git = "https://github.com/sultanc-lang/sultanc-language-support", rev = "REPLACE_WITH_COMMIT", subpath = "tree-sitter-sultanc" }
+source = { git = "https://github.com/sultan-language/sultanc-language-support", rev = "REPLACE_WITH_COMMIT", subpath = "tree-sitter-sultanc" }

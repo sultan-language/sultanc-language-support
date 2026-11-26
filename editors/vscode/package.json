@@ -2,7 +2,7 @@
   "name": "sultanc",
   "displayName": "SultanC",
   "description": "SultanC language support: the native SultanC language server (hover, completion, navigation, diagnostics in Arabic and English) and an optional Arabic-first RTL editor.",
-  "version": "0.15.0",
+  "version": "0.1.2",
   "publisher": "sultanc",
   "license": "MIT",
   "repository": {
@@ -536,8 +536,7 @@
     "bundle": "esbuild src/extension.js --bundle --platform=node --target=node18 --format=cjs --external:vscode --outfile=out/extension.js --minify --sourcemap",
     "package": "node tools/sync-grammar.js && npm run bundle && node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && npx --yes @vscode/vsce@3 package --no-dependencies --out dist/sultanc.vsix",
     "test:integration": "npm run bundle && node test/integration/runTest.js",
-    "test:rtl": "npm run bundle && node test/integration/rtlTyping.js",
-    "package:platforms": "node tools/package-platforms.js"
+    "test:rtl": "npm run bundle && node test/integration/rtlTyping.js"
   },
   "dependencies": {
     "vscode-languageclient": "9.0.1"

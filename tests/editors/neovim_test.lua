@@ -1,5 +1,5 @@
 -- Headless Neovim check: nvim --headless -u NONE -l tests/editors/neovim_test.lua
--- env: SULTANC_PARSER (built sultanc.so), SULTANC_HOME (checkout with build/sultanc-lsp)
+-- env: SULTANC_PARSER (built sultanc.so), SULTANC_HOME (checkout with build/sultanc-analyzer)
 local root = vim.fn.fnamemodify(debug.getinfo(1, 'S').source:sub(2), ':p:h:h:h')
 vim.opt.rtp:prepend(root .. '/editors/neovim')
 vim.cmd('filetype plugin on')
@@ -60,12 +60,12 @@ if vim.env.SULTANC_HOME then
   local attached = vim.wait(30000, function()
     return #vim.lsp.get_clients({ bufnr = 0, name = 'sultanc' }) > 0
   end, 100)
-  check('sultanc-lsp attaches', attached)
+  check('sultanc-analyzer attaches', attached)
   local got = vim.wait(60000, function()
     return #vim.diagnostic.get(0) > 0
   end, 200)
   local diags = vim.diagnostic.get(0)
-  check('diagnostic from sultanc-lsp', got and diags[1].lnum == 7 and diags[1].code == 'SULTANC-NAME-UNKNOWN',
+  check('diagnostic from sultanc-analyzer', got and diags[1].lnum == 7 and diags[1].code == 'SULTANC-NAME-UNKNOWN',
     vim.tbl_map(function(d) return { d.lnum, d.col, d.code } end, diags))
 end
 

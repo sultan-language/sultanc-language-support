@@ -863,7 +863,7 @@
         if (!composing) sendEdit();
         const cursor = sourceSelection().end;
         const previous = sourceText[cursor - 1];
-        if (!composing && (previous === '(' || previous === ',')) triggerSignature();
+        if (!composing && (previous === '(' || previous === ',' || previous === '،')) triggerSignature();
         completeWhileTyping();
     });
 

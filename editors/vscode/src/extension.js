@@ -1,6 +1,5 @@
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
 const vscode = require('vscode');
 const { LanguageClient, State, RevealOutputChannelOn } = require('vscode-languageclient/node');
@@ -66,12 +65,8 @@ let output = null;
 let busy = null;
 let tests = null;
 
-// The toolchain a platform-specific package bundles (tools/package-platforms.sh):
-// <extension>/sultanc/{build/sultanc-analyzer, build/sultanc, library/}.
-let bundledDir = null;
-
 function locateServer(folders, config) {
-    return findServer({ configuredPath: config.get('server.path', ''), workspaceFolders: folders, bundledDir });
+    return findServer({ configuredPath: config.get('server.path', ''), workspaceFolders: folders });
 }
 
 // SultanC home for compiler commands (run/check/build/explain), resolved like
@@ -80,7 +75,7 @@ function resolveHome() {
     const folders = workspaceFolderPaths();
     const config = configuration();
     const server = locateServer(folders, config);
-    return findHome({ configuredHome: config.get('home', ''), serverPath: server.path, bundledDir, workspaceFolders: folders });
+    return findHome({ configuredHome: config.get('home', ''), serverPath: server.path, workspaceFolders: folders });
 }
 
 function configuration() {
@@ -106,24 +101,27 @@ async function startClient(context) {
     const folders = workspaceFolderPaths();
     const config = configuration();
     const server = locateServer(folders, config);
-    // A packaged file can lose its executable bit when the .vsix is unpacked.
-    if (server.bundled && process.platform !== 'win32') {
-        try { fs.chmodSync(server.path, 0o755); } catch (_) { /* read-only install: leave it */ }
-    }
     if (!server.path) {
-        setStatus('error', 'SultanC language server not found — hover, completion and navigation are off. Set `sultanc.server.path` or build `build/sultanc-analyzer`.');
+        setStatus('error', 'SultanC language server not found — hover, completion and navigation are off. Install sultanc-analyzer into the SultanC toolchain or set `sultanc.server.path`.');
         output.appendLine('[client] server not found; searched:');
         for (const candidate of server.candidates) output.appendLine(`  ${candidate}`);
+        // As other language extensions do when their toolchain is missing:
+        // say what is missing and how to install it; never download binaries
+        // that would not match the user's compiler.
         const choice = await vscode.window.showErrorMessage(
-            'SultanC: language server not found. This package has no bundled server for your platform: install the package for your platform from the Marketplace, build it with `sultanc-analyzer/tools/build.sh <checkout>` (it writes <checkout>/build/sultanc-analyzer), or set "sultanc.server.path". The searched paths are in the SultanC output.',
-            'Open Settings'
+            'SultanC: the language server (sultanc-analyzer) is not installed. Install it into your SultanC toolchain (~/.supax), next to the compiler it matches, or set "sultanc.server.path".',
+            'How to Install', 'Set Path', 'Show Searched Paths'
         );
-        if (choice === 'Open Settings') {
+        if (choice === 'How to Install') {
+            vscode.env.openExternal(vscode.Uri.parse('https://github.com/sultan-language/sultanc-analyzer#install'));
+        } else if (choice === 'Set Path') {
             vscode.commands.executeCommand('workbench.action.openSettings', 'sultanc.server.path');
+        } else if (choice === 'Show Searched Paths') {
+            output.show(true);
         }
         return;
     }
-    const home = findHome({ configuredHome: config.get('home', ''), serverPath: server.path, bundledDir, workspaceFolders: folders });
+    const home = findHome({ configuredHome: config.get('home', ''), serverPath: server.path, workspaceFolders: folders });
     // The compiler resolves std under library/ relative to its working
     // directory, so the server runs from the SultanC home; documents and
     // workspace folders reach it as absolute URIs.
@@ -189,7 +187,7 @@ async function startClient(context) {
     });
 
     setStatus('starting', 'Starting the SultanC language server…');
-    output.appendLine(`[client] server: ${server.path}${server.bundled ? ' (bundled)' : ''}`);
+    output.appendLine(`[client] server: ${server.path}`);
     output.appendLine(`[client] SultanC home (server cwd): ${home || '(not found — std imports will not resolve)'}`);
     try {
         await client.start();
@@ -234,7 +232,6 @@ async function reopenActive(viewType) {
 }
 
 async function activate(context) {
-    bundledDir = path.join(context.extensionPath, 'sultanc');
     output = vscode.window.createOutputChannel(CLIENT_NAME);
     adapter = new LanguageServiceAdapter(output);
     statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0);

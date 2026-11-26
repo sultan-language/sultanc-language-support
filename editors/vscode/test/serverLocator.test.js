@@ -40,10 +40,12 @@ test('home is derived from a compiler checkout server path', () => {
     assert.strictEqual(findHome({ serverPath: '/src/sultanc/build/' + EXECUTABLE, env: {}, isFile }), path.normalize('/src/sultanc'));
 });
 
-test('configured home and SULTANC_HOME take precedence', () => {
+test('home: the setting, then the library next to the server, then SULTANC_HOME', () => {
     const isFile = fsWith(['/src/sultanc/library/std/io/println.sn']);
     assert.strictEqual(findHome({ configuredHome: '/mine', serverPath: '/src/sultanc/build/x', env: { SULTANC_HOME: '/env' }, isFile }), '/mine');
-    assert.strictEqual(findHome({ serverPath: '/src/sultanc/build/x', env: { SULTANC_HOME: '/env' }, isFile }), '/env');
+    // A server runs against the library it was built with (beside it).
+    assert.strictEqual(findHome({ serverPath: '/src/sultanc/build/x', env: { SULTANC_HOME: '/env' }, isFile }), '/src/sultanc');
+    assert.strictEqual(findHome({ serverPath: '/opt/x/sultanc-analyzer', env: { SULTANC_HOME: '/env' }, isFile }), '/env');
 });
 
 test('home falls back to a workspace folder holding the std library', () => {
@@ -68,21 +70,17 @@ test('finds the checkout one level below the opened folder, preferring sultanc',
     assert.strictEqual(findHome({ serverPath: found.path, workspaceFolders: ['/w'], env: {}, isFile, listDirs }), path.normalize('/w/sultanc'));
 });
 
-test('bundled server: after a checkout and SULTANC_HOME, before PATH; its own library wins', () => {
-    const bundle = path.join('/ext', 'sultanc');
-    const server = path.join(bundle, 'build', EXECUTABLE);
-    const isFile = fsWith([server, path.join(bundle, 'library', 'std', 'io', 'println.sn'), '/usr/bin/' + EXECUTABLE,
-        '/env/build/' + EXECUTABLE]);
-    let found = findServer({ env: { PATH: '/usr/bin' }, bundledDir: bundle, isFile });
-    assert.deepStrictEqual([found.path, found.bundled], [server, true]);
-    // A configured path keeps working.
-    found = findServer({ configuredPath: '/usr/bin/' + EXECUTABLE, env: {}, bundledDir: bundle, isFile });
-    assert.deepStrictEqual([found.path, found.bundled], ['/usr/bin/' + EXECUTABLE, false]);
-    found = findServer({ env: { SULTANC_HOME: '/env', PATH: '/usr/bin' }, bundledDir: bundle, isFile });
-    assert.strictEqual(found.path, '/env/build/' + EXECUTABLE);
-    // The bundled server runs against its own standard library, not $SULTANC_HOME's.
-    assert.strictEqual(findHome({ serverPath: server, bundledDir: bundle, env: { SULTANC_HOME: '/env' }, isFile }), bundle);
-    assert.strictEqual(findHome({ configuredHome: '/mine', serverPath: server, bundledDir: bundle, env: {}, isFile }), '/mine');
+test('installed toolchain: ~/.supax/bin/sultanc-analyzer after a checkout and SULTANC_HOME, before PATH', () => {
+    const server = path.join('/u/.supax', 'bin', EXECUTABLE);
+    const isFile = fsWith([server, '/u/.supax/lib/sultanc/library/std/io/println.sn', '/usr/bin/' + EXECUTABLE, '/env/build/' + EXECUTABLE]);
+    assert.strictEqual(findServer({ env: { HOME: '/u', PATH: '/usr/bin' }, isFile }).path, server);
+    assert.strictEqual(findServer({ env: { SUPAX_HOME: '/u/.supax', PATH: '/usr/bin' }, isFile }).path, server);
+    assert.strictEqual(findServer({ env: { HOME: '/u', SULTANC_HOME: '/env', PATH: '/usr/bin' }, isFile }).path, '/env/build/' + EXECUTABLE);
+    assert.strictEqual(findServer({ env: { HOME: '/nobody', PATH: '/usr/bin' }, isFile }).path, '/usr/bin/' + EXECUTABLE);
+    // The installed server runs against the installed library (as the
+    // compiler finds its own: <prefix>/lib/sultanc/library), not $SULTANC_HOME's.
+    assert.strictEqual(findHome({ serverPath: server, env: { SULTANC_HOME: '/env' }, isFile }), path.join('/u/.supax', 'lib', 'sultanc'));
+    assert.strictEqual(findHome({ configuredHome: '/mine', serverPath: server, env: {}, isFile }), '/mine');
 });
 
 test('a server built under the former name sultanc-lsp is still found, after sultanc-analyzer', () => {

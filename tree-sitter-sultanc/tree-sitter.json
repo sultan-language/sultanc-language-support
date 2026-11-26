@@ -13,7 +13,7 @@
     }
   ],
   "metadata": {
-    "version": "0.1.0",
+    "version": "0.1.2",
     "license": "MIT",
     "description": "SultanC grammar for tree-sitter (Arabic and English surfaces)",
     "links": { "repository": "https://github.com/sultanc-lang/sultanc-language-support" }
